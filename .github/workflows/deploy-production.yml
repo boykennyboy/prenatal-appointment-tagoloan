@@ -1,8 +1,8 @@
-name: Deploy to Hostinger (FTP)
+name: Deploy to Production
 
 on:
   push:
-    branches: [ '**' ]  # change to your deploy branch
+    branches: [ main ]
 
 jobs:
   detect:
@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
+      
       - id: filter
         name: Detect changed paths
         uses: dorny/paths-filter@v2
@@ -31,38 +31,39 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      ### -------- Build frontend (only if frontend changed) --------
+      ### -------- Build frontend --------
       - name: Setup Node (for frontend)
-        if: ${{ needs.detect.outputs.frontend == 'true' }}
-        uses: actions/setup-node@v3
+        if: needs.detect.outputs.frontend == 'true'
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
       - name: Install & build frontend
-        if: ${{ needs.detect.outputs.frontend == 'true' }}
+        if: needs.detect.outputs.frontend == 'true'
         run: |
           cd frontend
           npm ci
           npm run build
 
-      - name: Deploy frontend (FTP -> public_html)
-        if: ${{ needs.detect.outputs.frontend == 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      - name: Deploy frontend to production
+        if: needs.detect.outputs.frontend == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # port: ${{ secrets.FTP_PORT }}   # optional
-          local-dir: frontend/dist/
-          server-dir: /public_html/
+          port: 21
+          local-dir: ./frontend/dist/
+          server-dir: ./public_html/
 
-      ### -------- Deploy backend (only if backend changed) --------
-      - name: Deploy backend (FTP -> /api/)
-        if: ${{ needs.detect.outputs.backend == 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
+      ### -------- Deploy backend --------
+      - name: Deploy backend to production
+        if: needs.detect.outputs.backend == 'true'
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: backend/
-          server-dir: /api/
+          port: 21
+          local-dir: ./backend/
+          server-dir: ./public_html/api/
