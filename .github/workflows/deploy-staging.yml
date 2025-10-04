@@ -34,7 +34,7 @@ jobs:
       ### -------- Build frontend --------
       - name: Setup Node (for frontend)
         if: needs.detect.outputs.frontend == 'true'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.3.6
         with:
           node-version: '18'
 
@@ -59,7 +59,7 @@ jobs:
       ### -------- Deploy backend --------
       - name: Deploy backend to staging
         if: needs.detect.outputs.backend == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
