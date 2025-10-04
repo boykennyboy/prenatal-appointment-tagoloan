@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router';
-import { useAuthStore } from '../store/AuthStore';
+import { useAuthStore } from '../store/authStore.js';
 
 const AdminOnlyRoute = ({ children }) => {
   const { token } = useAuthStore();
