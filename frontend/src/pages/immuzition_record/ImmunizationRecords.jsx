@@ -5,7 +5,7 @@ import { immunization_records_columns } from '../../utils/columns';
 import FormModal from '../../components/ui/FormModal';
 import { useFormSubmit } from '../../utils/functions';
 import ImmunizationForm from '../../components/forms/immunizations/ImmunizationForm';
-import { useAuthStore } from '../../store/AuthStore';
+import { useAuthStore } from '../../store/authStore.js';
 import {
   immunizationEditFormData,
   immunizationFormData,

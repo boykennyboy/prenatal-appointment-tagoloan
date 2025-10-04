@@ -1,7 +1,7 @@
 import { Bell, Calendar, UserRound, Menu, X } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router';
-import { useAuthStore } from '../store/AuthStore.js';
+import { useAuthStore } from '../store/authStore.js';
 import useNotificationStore from '../store/notificationStore.js';
 import NotificationCard from './ui/NotificationCard';
 import SmallLoading from './ui/SmallLoading';

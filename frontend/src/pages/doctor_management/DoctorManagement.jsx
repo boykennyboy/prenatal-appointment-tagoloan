@@ -6,7 +6,7 @@ import FormModal from '../../components/ui/FormModal';
 import InputGroup from '../../components/ui/InputGroup';
 import { User } from 'lucide-react';
 import SelectGroup from '../../components/ui/SelectGroup';
-import { useAuthStore } from '../../store/AuthStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { doctor_columns } from '../../utils/columns.jsx';
 
 const DoctorManagement = () => {

@@ -5,7 +5,7 @@ import Container from '../../components/ui/Container';
 import { prenatal_visit_column } from '../../utils/columns';
 import FormModal from '../../components/ui/FormModal';
 import { useFormSubmit } from '../../utils/functions';
-import { useAuthStore } from '../../store/AuthStore';
+import { useAuthStore } from '../../store/authStore.js';
 import PrenatalVisitForm from '../../components/forms/prenatal_visits/PrenatalVisitForm';
 import {
   prenatalVisitEditFormData,

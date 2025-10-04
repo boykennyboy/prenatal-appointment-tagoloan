@@ -17,7 +17,7 @@ import SmallLoading from './SmallLoading';
 import DateInput from './DateInput';
 import Tooltip from '../Tooltip';
 import SelectReact from './SelectReact';
-import { useAuthStore } from '../../store/AuthStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import { pickerRangeOptions } from '../../utils/columns.jsx';
 import DatePicker from './DatePicker.jsx';
 

@@ -7,7 +7,7 @@ import FormModal from '../../components/ui/FormModal';
 import { User } from 'lucide-react';
 import SelectReact from '../../components/ui/SelectReact';
 import { midwife_columns } from '../../utils/columns';
-import { useAuthStore } from '../../store/AuthStore';
+import { useAuthStore } from '../../store/authStore.js';
 
 const Midwives = () => {
   const { user } = useAuthStore();

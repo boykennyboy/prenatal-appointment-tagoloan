@@ -1,7 +1,7 @@
 import { LogOut, UserRound, X } from 'lucide-react';
 import { NavLink } from 'react-router';
 import Logo from '../assets/st-paul-logo.webp';
-import { useAuthStore } from '../store/AuthStore.js';
+import { useAuthStore } from '../store/authStore.js';
 
 const MobileSidebar = ({ isOpen, setIsOpen, mainLinks, user }) => {
   const { logout } = useAuthStore();
