@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+    --font-display: 'Montserrat', sans-serif;
+    
+    --color-primary: #785BF8;
+}
+
+.primary-btn {
+    @apply bg-purple-500 text-white hover:bg-purple-400 transition-all;
+}
+
+.download-btn {
+    @apply bg-green-500 text-white hover:bg-green-400 transition-all;
+}
+
+.container {
+    @apply mt-5 bg-white border border-gray-300 p-6 rounded-2xl shadow;
+}
+
+.input-field {
+    @apply p-3 outline-none border-2 border-gray-500 rounded-full;
+}
+
+.input-field-1 {
+    @apply p-3 outline-none border-2 border-gray-500 rounded-md;
+}
+
+.error {
+    @apply text-red-500 text-sm;
+}
+
+html {
+  font-family: 'Poppins', sans-serif;
+  overflow-x: hidden;
+}
+
+.fc-event-content-wrapper {
+    padding: 2px;
+}
+
+.fc-event-doctors {
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 2px;
+}
+
+.fc-event-title {
+    font-weight: bold;
+    margin-bottom: 2px;
+}
+
+/* Adjust event height to accommodate doctor info */
+.fc-daygrid-event {
+    white-space: normal !important;
+    min-height: 40px;
+}
+
+
+.flatpickr-input {
+    display: none;
+}
+
+.fc-day-today{
+    background-color: #155dfc !important;
+    color: white !important;
+}
+
+/* Mobile toolbar adjustments */
+@media (max-width: 768px) {
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 1rem;
+    }
+
+    .fc .fc-button {
+        padding: 4px 8px;
+        font-size: 0.8rem;
+    }
+}
