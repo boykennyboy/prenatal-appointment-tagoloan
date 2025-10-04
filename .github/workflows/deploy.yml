@@ -47,7 +47,7 @@ jobs:
 
       - name: Deploy frontend (FTP -> public_html)
         if: ${{ needs.detect.outputs.frontend == 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
@@ -59,7 +59,7 @@ jobs:
       ### -------- Deploy backend (only if backend changed) --------
       - name: Deploy backend (FTP -> /api/)
         if: ${{ needs.detect.outputs.backend == 'true' }}
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
