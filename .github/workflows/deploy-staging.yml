@@ -55,7 +55,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: /public_html/staging/
+          server-dir: ./staging/
           exclude: |
             **/.git*
             **/.github*
@@ -70,7 +70,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./backend/
-          server-dir: /public_html/staging/api/
+          server-dir: ./staging/api/
           exclude: |
             **/.git*
             **/.github*
