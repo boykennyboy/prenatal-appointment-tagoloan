@@ -1,4 +1,4 @@
-name: Deploy to Staging
+name: 🚀 Deploy to Staging
 
 on:
   push:
@@ -11,11 +11,8 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - id: filter
-        name: Detect changed paths
         uses: dorny/paths-filter@v2
         with:
           filters: |
@@ -27,9 +24,9 @@ jobs:
   deploy:
     needs: detect
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       ### -------- Build frontend --------
       - name: Setup Node (for frontend)
@@ -45,6 +42,10 @@ jobs:
           npm ci
           npm run build
 
+      - name: Verify frontend build output
+        if: needs.detect.outputs.frontend == 'true'
+        run: ls -l ./frontend/dist
+
       - name: Deploy frontend to staging
         if: needs.detect.outputs.frontend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
@@ -54,7 +55,10 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: /public_html/staging/ # adjust based on your hosting setup
+          server-dir: /public_html/staging/
+          exclude: |
+            **/.git*
+            **/.github*
 
       ### -------- Deploy backend --------
       - name: Deploy backend to staging
@@ -66,4 +70,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./backend/
-          server-dir: /public_html/staging/api # adjust based on your hosting setup
+          server-dir: /public_html/staging/api/
+          exclude: |
+            **/.git*
+            **/.github*
