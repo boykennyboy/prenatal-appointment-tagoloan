@@ -16,6 +16,7 @@ const NewPatientBasicInfo = ({ formData, inputChange, error, setFormData }) => {
             type='text'
             name='firstname'
             noNumbers
+            required
             value={formData.firstname}
             onChange={inputChange}
             placeholder='First name'
@@ -33,6 +34,7 @@ const NewPatientBasicInfo = ({ formData, inputChange, error, setFormData }) => {
             type='text'
             name='lastname'
             noNumbers
+            required
             value={formData.lastname}
             onChange={inputChange}
             placeholder='Last name'

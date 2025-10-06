@@ -97,7 +97,13 @@ export const pregnancy_tracking_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
 
   {
@@ -339,8 +345,13 @@ export const barangay_center_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
-  },
+      render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },  },
   {
     key: 'id',
     hidden: true,
@@ -396,7 +407,13 @@ export const barangay_worker_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -441,7 +458,13 @@ export const nurse_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -486,7 +509,13 @@ export const midwife_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -524,7 +553,13 @@ export const user_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -567,6 +602,13 @@ export const prenatal_visit_column = [
     title: 'Date',
     sortable: true,
     width: 'w-[10%]',
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'weight',
@@ -598,7 +640,13 @@ export const prenatal_visit_column = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
 
   {
@@ -738,6 +786,13 @@ export const out_patient_column = [
     title: 'Date',
     sortable: true,
     width: 'w-[10%]',
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'time',
@@ -799,7 +854,13 @@ export const out_patient_column = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -939,7 +1000,13 @@ export const immunization_records_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -1210,7 +1277,13 @@ export const appointment_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -1304,7 +1377,13 @@ export const doctor_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[20%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
@@ -1379,7 +1458,13 @@ export const activity_log_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[7%]',
-    render: (value) => new Date(value).toLocaleDateString(),
+     render: (value) => {
+      return new Date(value).toLocaleDateString('en-US', {
+        month: 'short', // "Oct"
+        day: '2-digit', // "01"
+        year: 'numeric', // "2025"
+      });
+    },
   },
   {
     key: 'id',
