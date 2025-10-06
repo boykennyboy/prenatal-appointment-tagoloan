@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\ActivityLogsController;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\Api\SelectAddressController;
+use App\Http\Controllers\API\SelectAddressController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarangayCenterController;
 use App\Http\Controllers\BarangayWorkerController;
