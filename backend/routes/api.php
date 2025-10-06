@@ -2,12 +2,12 @@
 
 use App\Http\Controllers\ActivityLogsController;
 use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\SelectAddressController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\BarangayCenterController;
 use App\Http\Controllers\BarangayWorkerController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\FilterController;
 use App\Http\Controllers\ImmuzitionRecordController;
 use App\Http\Controllers\MidwifeController;
 use App\Http\Controllers\NotificationController;
@@ -67,20 +67,20 @@ Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
 
     
     Route::put('/edit/pregnancy-trackings/{pregnancy_tracking}', [PregnancyTrackingController::class, 'update_pregnancy']);
-    Route::get('/select-address/regions', [SelectAddressController::class, 'regions']);
-    Route::get('/select-address/provinces/{region}', [SelectAddressController::class, 'provinces']);
-    Route::get('/select-address/municipalities/{province}', [SelectAddressController::class, 'municipalities']);
-    Route::get('/select-address/barangays/{municipality}', [SelectAddressController::class, 'barangays']);
-    Route::get('/midwives/barangay-centers/{barangay_center}', [SelectAddressController::class, 'midwives']);
-    Route::get('/barangay-workers/barangay-centers/{barangay_center}', [SelectAddressController::class, 'barangay_workers']);
-    Route::get('/nurses/barangay-centers/{barangay_center}', [SelectAddressController::class, 'nurses']);
-    Route::get('/address-name', [SelectAddressController::class, 'getAddressName']);
-    Route::get('/midwife-and-barangay-worker-name', [SelectAddressController::class, 'getMidwifeAndBarangayWorkerName']);
-    Route::get('/midwife-and-nurse-name', [SelectAddressController::class, 'getMidwifeAndNurseName']);
-    Route::get('/filter/roles', [SelectAddressController::class, 'roles']);
-    Route::get('/filter/pregnancy-trakings', [SelectAddressController::class, 'pregnancy_trackings']);
-    Route::get('/filter/pregnancy-trakings/has-appointments', [SelectAddressController::class, 'pregnancy_trackings_has_appointments']);
+    Route::get('/select-address/regions', [FilterController::class, 'regions']);
+    Route::get('/select-address/provinces/{region}', [FilterController::class, 'provinces']);
+    Route::get('/select-address/municipalities/{province}', [FilterController::class, 'municipalities']);
+    Route::get('/select-address/barangays/{municipality}', [FilterController::class, 'barangays']);
+    Route::get('/midwives/barangay-centers/{barangay_center}', [FilterController::class, 'midwives']);
+    Route::get('/barangay-workers/barangay-centers/{barangay_center}', [FilterController::class, 'barangay_workers']);
+    Route::get('/nurses/barangay-centers/{barangay_center}', [FilterController::class, 'nurses']);
+    Route::get('/address-name', [FilterController::class, 'getAddressName']);
+    Route::get('/midwife-and-barangay-worker-name', [FilterController::class, 'getMidwifeAndBarangayWorkerName']);
+    Route::get('/midwife-and-nurse-name', [FilterController::class, 'getMidwifeAndNurseName']);
+    Route::get('/filter/roles', [FilterController::class, 'roles']);
+    Route::get('/filter/pregnancy-trakings', [FilterController::class, 'pregnancy_trackings']);
+    Route::get('/filter/pregnancy-trakings/has-appointments', [FilterController::class, 'pregnancy_trackings_has_appointments']);
     Route::get('/available-appointments', [AppointmentController::class, 'getAvailabilityByRange']);
     Route::get('/group-prenatal-visits/{id}', [PrenatalVisitController::class, 'getGroupPrenatalVisit']);
-    Route::get('/nurse-and-midwife-existence', [SelectAddressController::class, 'checkNurseMidwifeExistence']);
+    Route::get('/nurse-and-midwife-existence', [FilterController::class, 'checkNurseMidwifeExistence']);
 });
