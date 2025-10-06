@@ -206,8 +206,8 @@ jobs:
           exclude: |
             **/.git*
             **/.github*
-
-           ### -------- Deploy backend --------
+            
+            ### -------- Deploy backend --------
       - name: Deploy backend to staging
         if: needs.detect.outputs.backend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
