@@ -35,7 +35,6 @@ class DashboardController extends Controller
             'total_first_trimester' => (clone $baseQuery)->where('pregnancy_status', 'first_trimester')->count(),
         ];
 
-        // Get counts for related tables separately
         $pregnancyTrackingIds = (clone $baseQuery)->pluck('id');
 
         $stats['total_appointments'] = Appointment::whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
