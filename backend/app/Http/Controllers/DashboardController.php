@@ -17,32 +17,33 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-
         $user = Auth::user();
 
-        $query = PregnancyTracking::select(
-            DB::raw('COUNT(DISTINCT patients.id) AS total_patients'),
-            DB::raw('COUNT(DISTINCT pregnancy_trackings.id) AS total_pregnancy_tracking'),
-            DB::raw('COUNT(DISTINCT appointments.id) AS total_appointments'),
-            DB::raw("SUM(CASE WHEN pregnancy_trackings.pregnancy_status = 'first_trimester' THEN 1 ELSE 0 END) as total_first_trimester"),
-            DB::raw("SUM(CASE WHEN pregnancy_trackings.pregnancy_status = 'second_trimester' THEN 1 ELSE 0 END) as total_second_trimester"),
-            DB::raw("SUM(CASE WHEN pregnancy_trackings.pregnancy_status = 'third_trimester' THEN 1 ELSE 0 END) as total_third_trimester"),
-            DB::raw("SUM(CASE WHEN pregnancy_trackings.pregnancy_status = 'completed' THEN 1 ELSE 0 END) as total_completed"),
-            DB::raw('COUNT(DISTINCT immuzition_records.id) AS total_immunization'),
-            DB::raw('COUNT(DISTINCT prenatal_visits.id) AS total_prenatal_visit'),
-            DB::raw('COUNT(DISTINCT out_patients.id) AS total_out_patients')
-        )
-            ->leftJoin('patients', 'pregnancy_trackings.patient_id', '=', 'patients.id')
-            ->leftJoin('appointments', 'pregnancy_trackings.id', '=', 'appointments.pregnancy_tracking_id')
-            ->leftJoin('immuzition_records', 'pregnancy_trackings.id', '=', 'immuzition_records.pregnancy_tracking_id')
-            ->leftJoin('prenatal_visits', 'pregnancy_trackings.id', '=', 'prenatal_visits.pregnancy_tracking_id')
-            ->leftJoin('out_patients', 'pregnancy_trackings.id', '=', 'out_patients.pregnancy_tracking_id')
+        // Build base query with user filter
+        $baseQuery = PregnancyTracking::query()
             ->when($user && $user->role_id === 2, function ($query) use ($user) {
                 $query->where('pregnancy_trackings.barangay_center_id', $user->barangay_center_id);
-            })
-            ->first();
+            });
 
+        // Get accurate counts using separate queries to avoid JOIN multiplication
+        $stats = [
+            'total_patients' => (clone $baseQuery)->distinct('patient_id')->count('patient_id'),
+            'total_pregnancy_tracking' => (clone $baseQuery)->count(),
+            'total_completed' => (clone $baseQuery)->where('pregnancy_status', 'completed')->count(),
+            'total_third_trimester' => (clone $baseQuery)->where('pregnancy_status', 'third_trimester')->count(),
+            'total_second_trimester' => (clone $baseQuery)->where('pregnancy_status', 'second_trimester')->count(),
+            'total_first_trimester' => (clone $baseQuery)->where('pregnancy_status', 'first_trimester')->count(),
+        ];
 
+        // Get counts for related tables separately
+        $pregnancyTrackingIds = (clone $baseQuery)->pluck('id');
+
+        $stats['total_appointments'] = Appointment::whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
+        $stats['total_immunization'] = DB::table('immuzition_records')->whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
+        $stats['total_prenatal_visit'] = DB::table('prenatal_visits')->whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
+        $stats['total_out_patients'] = DB::table('out_patients')->whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
+
+        // Get recent pregnancy data
         $pregnancy = PregnancyTracking::with(['patient', 'barangay_center'])
             ->when($user && $user->role_id === 2, function ($query) use ($user) {
                 $query->where('barangay_center_id', $user->barangay_center_id);
@@ -51,16 +52,21 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-
+        // Get upcoming appointments
         $appointment_data = Appointment::with(['pregnancy_tracking', 'pregnancy_tracking.barangay_center'])
             ->whereBetween('appointment_date', [
                 Carbon::today(),
                 Carbon::today()->addWeek()
             ])
+            ->when($user && $user->role_id === 2, function ($query) use ($user) {
+                $query->whereHas('pregnancy_tracking', function ($q) use ($user) {
+                    $q->where('barangay_center_id', $user->barangay_center_id);
+                });
+            })
             ->get();
 
         return [
-            'data' => $query,
+            'data' => (object) $stats,
             'pregnancy_data' => DashboardPregnancyResource::collection($pregnancy),
             'appointment_data' => DashboardAppointmentResource::collection($appointment_data),
         ];
