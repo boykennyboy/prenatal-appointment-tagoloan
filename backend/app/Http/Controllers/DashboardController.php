@@ -43,7 +43,6 @@ class DashboardController extends Controller
         $stats['total_prenatal_visit'] = DB::table('prenatal_visits')->whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
         $stats['total_out_patients'] = DB::table('out_patients')->whereIn('pregnancy_tracking_id', $pregnancyTrackingIds)->count();
 
-        // Get recent pregnancy data
         $pregnancy = PregnancyTracking::with(['patient', 'barangay_center'])
             ->when($user && $user->role_id === 2, function ($query) use ($user) {
                 $query->where('barangay_center_id', $user->barangay_center_id);
@@ -52,7 +51,6 @@ class DashboardController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get upcoming appointments
         $appointment_data = Appointment::with(['pregnancy_tracking', 'pregnancy_tracking.barangay_center'])
             ->whereBetween('appointment_date', [
                 Carbon::today(),
