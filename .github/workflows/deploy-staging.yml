@@ -35,90 +35,6 @@ jobs:
         with:
           node-version: '22.14.0'
 
-      - name: Install & build frontend
-        if: needs.detect.outputs.frontend == 'true'
-        env:
-          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
-          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
-          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
-          VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
-          VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
-        run: |
-          cd frontend
-          npm ci
-          npm run build
-
-      - name: Verify frontend build output
-        if: needs.detect.outputs.frontend == 'true'
-        run: ls -l ./frontend/dist
-
-      - name: Deploy frontend to staging
-        if: needs.detect.outputs.frontend == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          local-dir: ./frontend/dist/
-          server-dir: /public_html/staging/
-          exclude: |
-            **/.git*
-            **/.github*
-
-      ### -------- Deploy backend --------
-      - name: Deploy backend to staging
-        if: needs.detect.outputs.backend == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          local-dir: ./backend/
-          server-dir: /public_html/staging/api/
-          exclude: |
-            **/.git*
-            **/.github*
-Milven Albia
-9:30 AM
-name: 🚀 Deploy to Staging
-
-on:
-  push:
-    branches: [staging]
-
-jobs:
-  detect:
-    runs-on: ubuntu-latest
-    outputs:
-      frontend: ${{ steps.filter.outputs.frontend }}
-      backend: ${{ steps.filter.outputs.backend }}
-    steps:
-      - uses: actions/checkout@v4
-      - id: filter
-        uses: dorny/paths-filter@v2
-        with:
-          filters: |
-            frontend:
-              - 'frontend/**'
-            backend:
-              - 'backend/**'
-
-  deploy:
-    needs: detect
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      ### -------- Build frontend --------
-      - name: Setup Node (for frontend)
-        if: needs.detect.outputs.frontend == 'true'
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.14.0'
-
       - name: Cache npm dependencies
         if: needs.detect.outputs.frontend == 'true'
         uses: actions/cache@v3
@@ -207,7 +123,7 @@ jobs:
             **/.git*
             **/.github*
             
-            ### -------- Deploy backend --------
+          ### -------- Deploy backend --------
       - name: Deploy backend to staging
         if: needs.detect.outputs.backend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
