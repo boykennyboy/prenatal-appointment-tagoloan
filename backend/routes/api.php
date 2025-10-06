@@ -28,7 +28,6 @@ Route::get('/user', function (Request $request) {
 Route::post('/login', [AuthController::class, 'login'])->middleware(['throttle:login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/activity-logs/actions', [ActivityLogsController::class, 'getActivityActions']);
 
 Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
     // Api Resource
