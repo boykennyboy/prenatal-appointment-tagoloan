@@ -7,7 +7,7 @@ import { useFormSubmit } from '../../utils/functions';
 import FormModal from '../../components/ui/FormModal';
 import SelectReact from '../../components/ui/SelectReact';
 import { nurse_columns } from '../../utils/columns';
-import { useAuthStore } from '../../store/AuthStore';
+import { useAuthStore } from '../../store/authStore.js';
 
 const Nurse = () => {
   const [isOpen, setIsOpen] = useState(false);

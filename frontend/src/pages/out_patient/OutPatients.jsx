@@ -4,7 +4,7 @@ import Container from '../../components/ui/Container';
 import { out_patient_column } from '../../utils/columns';
 import FormModal from '../../components/ui/FormModal';
 import { useFormSubmit } from '../../utils/functions';
-import { useAuthStore } from '../../store/AuthStore';
+import { useAuthStore } from '../../store/authStore.js';
 import OutPatientsForm from '../../components/forms/outpatients/OutPatientsForm';
 import {
   outPatientEditFormData,

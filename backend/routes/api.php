@@ -25,15 +25,9 @@ Route::get('/user', function (Request $request) {
     return $request->user()->load('barangay_center');
 })->middleware('auth:sanctum');
 
-Route::get('/test-broadcast', function () {
-    broadcast(new \App\Events\UserNotified('Test broadcast from route'));
-    return response()->json(['status' => 'Event dispatched']);
-});
-
 Route::post('/login', [AuthController::class, 'login'])->middleware(['throttle:login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::get('/activity-logs/actions', [ActivityLogsController::class, 'getActivityActions']);
 
 Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
     // Api Resource
@@ -71,13 +65,7 @@ Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
     // Delete all read notifications
     Route::delete('/notifications/delete-all-read', [NotificationController::class, 'deleteAllRead']);
 
-    // Route::prefix('appointments')->group(function () {
-    //     Route::get('/available-slots', [AppointmentController::class, 'getAvailableSlots']);
-    //     Route::get('/calendar', [AppointmentController::class, 'getCalendarData']);
-    //     Route::post('/', [AppointmentController::class, 'store']);
-    //     Route::put('/{id}', [AppointmentController::class, 'update']);
-    //     Route::delete('/{id}', [AppointmentController::class, 'cancel']);
-    // });
+    
     Route::put('/edit/pregnancy-trackings/{pregnancy_tracking}', [PregnancyTrackingController::class, 'update_pregnancy']);
     Route::get('/select-address/regions', [SelectAddressController::class, 'regions']);
     Route::get('/select-address/provinces/{region}', [SelectAddressController::class, 'provinces']);

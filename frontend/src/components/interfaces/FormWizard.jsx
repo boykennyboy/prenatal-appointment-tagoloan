@@ -10,7 +10,7 @@ import {
   pregnancyEditFormData,
   pregnancyFormData,
 } from '../../utils/formDefault.jsx';
-import { useAuthStore } from '../../store/AuthStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import RiskCodes from './form-wizard/RiskCodes.jsx';
 
 const FormWizard = ({ row = null }) => {

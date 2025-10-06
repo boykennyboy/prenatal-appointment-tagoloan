@@ -4,7 +4,7 @@ import { pdf } from '@react-pdf/renderer';
 import Container from '../../components/ui/Container';
 import DataTable from '../../components/ui/Datatable';
 import { pregnancy_tracking_columns } from '../../utils/columns';
-import { useAuthStore } from '../../store/AuthStore.js';
+import { useAuthStore } from '../../store/authStore.js';
 import PregnancyTrackingPDF from '../../components/interfaces/pdf/PregnancyTrackingPDF.jsx';
 import { useFormSubmit } from '../../utils/functions.jsx';
 import DatePicker from '../../components/ui/DatePicker.jsx';

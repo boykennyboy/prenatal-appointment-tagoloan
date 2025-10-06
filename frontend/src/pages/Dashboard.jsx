@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 import Card from '../components/interfaces/cards/Card';
-import { useAuthStore } from '../store/AuthStore.js';
+import { useAuthStore } from '../store/authStore.js';
 import Title from '../components/Title.jsx';
 import useDashboardStore from '../store/dashboardStore.js';
 

@@ -1,8 +1,8 @@
-name: Deploy to Staging
+name: 🚀 Deploy to Staging
 
 on:
   push:
-    branches: [ staging ]
+    branches: [staging]
 
 jobs:
   detect:
@@ -11,11 +11,8 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
+      - uses: actions/checkout@v4
       - id: filter
-        name: Detect changed paths
         uses: dorny/paths-filter@v2
         with:
           filters: |
@@ -27,36 +24,106 @@ jobs:
   deploy:
     needs: detect
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       ### -------- Build frontend --------
       - name: Setup Node (for frontend)
         if: needs.detect.outputs.frontend == 'true'
-        uses: actions/setup-node@v4.3.6
+        uses: actions/setup-node@v4
         with:
           node-version: '22.14.0'
 
+      - name: Cache npm dependencies
+        if: needs.detect.outputs.frontend == 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Debug - Check environment variables
+        if: needs.detect.outputs.frontend == 'true'
+        env:
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+        run: |
+          echo "Checking if secrets are set..."
+          if [ -z "$VITE_PUSHER_APP_KEY" ]; then
+            echo "❌ VITE_PUSHER_APP_KEY is NOT set!"
+          else
+            echo "✅ VITE_PUSHER_APP_KEY is set (length: ${#VITE_PUSHER_APP_KEY} chars)"
+          fi
+          
+          if [ -z "$VITE_PUSHER_APP_CLUSTER" ]; then
+            echo "❌ VITE_PUSHER_APP_CLUSTER is NOT set!"
+          else
+            echo "✅ VITE_PUSHER_APP_CLUSTER is set: $VITE_PUSHER_APP_CLUSTER"
+          fi
+
       - name: Install & build frontend
         if: needs.detect.outputs.frontend == 'true'
+        env:
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+          VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
+          VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
         run: |
           cd frontend
           npm ci
+          echo "Building with Vite..."
           npm run build
+
+      - name: Verify frontend build output
+        if: needs.detect.outputs.frontend == 'true'
+        run: ls -l ./frontend/dist
+
+      - name: Debug - Check if Pusher key in build
+        if: needs.detect.outputs.frontend == 'true'
+        run: |
+          echo "Checking if Pusher configuration is in the built files..."
+          cd frontend/dist
+          
+          # Check if any JS files exist
+          if ls assets/*.js 1> /dev/null 2>&1; then
+            echo "✅ JavaScript files found in build"
+            
+            # Check for Pusher references (don't print actual keys)
+            if grep -l "pusher" assets/*.js > /dev/null 2>&1; then
+              echo "✅ Pusher references found in build"
+            else
+              echo "❌ WARNING: No Pusher references found in build!"
+            fi
+            
+            # Check for cluster config
+            if grep -l "cluster" assets/*.js > /dev/null 2>&1; then
+              echo "✅ Cluster configuration found in build"
+            else
+              echo "❌ WARNING: No cluster configuration found!"
+            fi
+          else
+            echo "❌ ERROR: No JavaScript files found in build!"
+            exit 1
+          fi
 
       - name: Deploy frontend to staging
         if: needs.detect.outputs.frontend == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: ./staging/  # adjust based on your hosting setup
-
-      ### -------- Deploy backend --------
+          server-dir: ./staging/
+          exclude: |
+            **/.git*
+            **/.github*
+            
+          ### -------- Deploy backend --------
       - name: Deploy backend to staging
         if: needs.detect.outputs.backend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
@@ -66,4 +133,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./backend/
-          server-dir: ./staging/api/  # adjust based on your hosting setup
+          server-dir: ./staging/api/
+          exclude: |
+            **/.git*
+            **/.github*
