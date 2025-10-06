@@ -1,8 +1,9 @@
-name: Deploy to Production
+name: 🚀 Deploy to Production
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main  # triggers when you push to main branch
 
 jobs:
   detect:
@@ -11,9 +12,9 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
       backend: ${{ steps.filter.outputs.backend }}
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - id: filter
         name: Detect changed paths
         uses: dorny/paths-filter@v2
@@ -28,24 +29,32 @@ jobs:
     needs: detect
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      ### -------- Build frontend --------
+      ### -------- Build Frontend --------
       - name: Setup Node (for frontend)
         if: needs.detect.outputs.frontend == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '22.14.0'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install & build frontend
+      - name: Install & Build Frontend
         if: needs.detect.outputs.frontend == 'true'
+        env:
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+          VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
+          VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
         run: |
           cd frontend
           npm ci
           npm run build
 
-      - name: Deploy frontend to production
+      - name: Deploy Frontend via FTP
         if: needs.detect.outputs.frontend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -54,10 +63,13 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: ./public_html/
+          server-dir: public_html/  # ✅ deploys directly into your live site
+          exclude: |
+            **/.git*
+            **/.github*
 
-      ### -------- Deploy backend --------
-      - name: Deploy backend to production
+      ### -------- Deploy Backend --------
+      - name: Deploy Backend via FTP
         if: needs.detect.outputs.backend == 'true'
         uses: SamKirkland/FTP-Deploy-Action@v4.3.6
         with:
@@ -66,4 +78,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./backend/
-          server-dir: ./public_html/api/
+          server-dir: public_html/api/  # ✅ backend lives inside /public_html/api
+          exclude: |
+            **/.git*
+            **/.github*

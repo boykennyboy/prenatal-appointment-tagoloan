@@ -37,6 +37,12 @@ jobs:
 
       - name: Install & build frontend
         if: needs.detect.outputs.frontend == 'true'
+        env:
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+          VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
+          VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
         run: |
           cd frontend
           npm ci
@@ -55,7 +61,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: ./staging/
+          server-dir: /public_html/staging/
           exclude: |
             **/.git*
             **/.github*
@@ -70,7 +76,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./backend/
-          server-dir: ./staging/api/
+          server-dir: /public_html/staging/api/
           exclude: |
             **/.git*
             **/.github*

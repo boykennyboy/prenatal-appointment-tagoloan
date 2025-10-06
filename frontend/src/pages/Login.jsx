@@ -63,7 +63,7 @@ export default function LoginPage() {
         {/* Welcome Content */}
         <div className='relative z-10 flex flex-col justify-center h-full px-16'>
           <h1 className='text-5xl max-w-2xl font-bold text-white mb-6 leading-tight'>
-            Welcome to St. Paul Prenatal KEN
+            Welcome to St. Paul Prenatal KENNY
           </h1>
           <p className='text-white/90 text-lg leading-relaxed max-w-xl'>
             Here, you can book and keep track of prenatal records without the
