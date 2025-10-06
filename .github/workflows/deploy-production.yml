@@ -157,6 +157,8 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/u423729572/domains/prenatal-appointment-tagoloan.com/public_html/api
+            composer dump-autoload --optimize --no-dev
+            php artisan package:discover --ansi
             php artisan config:clear
             php artisan cache:clear
             php artisan route:clear
