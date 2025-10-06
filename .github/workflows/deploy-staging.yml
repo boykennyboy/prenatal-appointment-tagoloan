@@ -35,6 +35,34 @@ jobs:
         with:
           node-version: '22.14.0'
 
+      - name: Cache npm dependencies
+        if: needs.detect.outputs.frontend == 'true'
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Debug - Check environment variables
+        if: needs.detect.outputs.frontend == 'true'
+        env:
+          VITE_PUSHER_APP_KEY: ${{ secrets.VITE_PUSHER_APP_KEY }}
+          VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
+        run: |
+          echo "Checking if secrets are set..."
+          if [ -z "$VITE_PUSHER_APP_KEY" ]; then
+            echo "❌ VITE_PUSHER_APP_KEY is NOT set!"
+          else
+            echo "✅ VITE_PUSHER_APP_KEY is set (length: ${#VITE_PUSHER_APP_KEY} chars)"
+          fi
+          
+          if [ -z "$VITE_PUSHER_APP_CLUSTER" ]; then
+            echo "❌ VITE_PUSHER_APP_CLUSTER is NOT set!"
+          else
+            echo "✅ VITE_PUSHER_APP_CLUSTER is set: $VITE_PUSHER_APP_CLUSTER"
+          fi
+
       - name: Install & build frontend
         if: needs.detect.outputs.frontend == 'true'
         env:
@@ -46,11 +74,40 @@ jobs:
         run: |
           cd frontend
           npm ci
+          echo "Building with Vite..."
           npm run build
 
       - name: Verify frontend build output
         if: needs.detect.outputs.frontend == 'true'
         run: ls -l ./frontend/dist
+
+      - name: Debug - Check if Pusher key in build
+        if: needs.detect.outputs.frontend == 'true'
+        run: |
+          echo "Checking if Pusher configuration is in the built files..."
+          cd frontend/dist
+          
+          # Check if any JS files exist
+          if ls assets/*.js 1> /dev/null 2>&1; then
+            echo "✅ JavaScript files found in build"
+            
+            # Check for Pusher references (don't print actual keys)
+            if grep -l "pusher" assets/*.js > /dev/null 2>&1; then
+              echo "✅ Pusher references found in build"
+            else
+              echo "❌ WARNING: No Pusher references found in build!"
+            fi
+            
+            # Check for cluster config
+            if grep -l "cluster" assets/*.js > /dev/null 2>&1; then
+              echo "✅ Cluster configuration found in build"
+            else
+              echo "❌ WARNING: No cluster configuration found!"
+            fi
+          else
+            echo "❌ ERROR: No JavaScript files found in build!"
+            exit 1
+          fi
 
       - name: Deploy frontend to staging
         if: needs.detect.outputs.frontend == 'true'
@@ -61,22 +118,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           local-dir: ./frontend/dist/
-          server-dir: /public_html/staging/
-          exclude: |
-            **/.git*
-            **/.github*
-
-      ### -------- Deploy backend --------
-      - name: Deploy backend to staging
-        if: needs.detect.outputs.backend == 'true'
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.6
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          port: 21
-          local-dir: ./backend/
-          server-dir: /public_html/staging/api/
+          server-dir: ./staging/
           exclude: |
             **/.git*
             **/.github*
