@@ -111,15 +111,7 @@ class AppointmentController extends Controller
             ];
         }
 
-        return [
-            'data' => AppointmentResource::collection($appointments),
-            'meta' => [
-                'total' => $appointments->total(),
-                'per_page' => $appointments->perPage(),
-                'current_page' => $appointments->currentPage(),
-                'last_page' => $appointments->lastPage(),
-            ],
-        ];
+       
     }
 
     public function show(Appointment $qppointment) {}
@@ -159,7 +151,6 @@ class AppointmentController extends Controller
             if (!empty($pregnancy_tracking->lmp)) {
                 $appointmentDate = Carbon::parse($request->appointment_date);
                 $status = $this->calculatePregnancyStatus($pregnancy_tracking->lmp, $appointmentDate);
-                $pregnancy_tracking->update(['pregnancy_status' => $status]);
                 $appointment->update(['pregnancy_status' => $status]);
             }
 
@@ -284,7 +275,6 @@ class AppointmentController extends Controller
                 // ✅ Old tracking status based on NOW
                 if ($old_pregnancy_tracking->lmp) {
                     $status = $this->calculatePregnancyStatus($old_pregnancy_tracking->lmp, Carbon::now());
-                    $old_pregnancy_tracking->update(['pregnancy_status' => $status]);
                 }
 
                 $new_pregnancy_tracking = PregnancyTracking::find($new_pregnancy_tracking_id);
@@ -300,7 +290,6 @@ class AppointmentController extends Controller
                 if ($new_pregnancy_tracking->lmp) {
                     $appointmentDate = Carbon::parse($request->appointment_date);
                     $status = $this->calculatePregnancyStatus($new_pregnancy_tracking->lmp, $appointmentDate);
-                    $new_pregnancy_tracking->update(['pregnancy_status' => $status]);
                     $appointment->update(['pregnancy_status' => $status]);
                 }
             } else {
@@ -310,7 +299,7 @@ class AppointmentController extends Controller
                 if ($pregnancy_tracking->lmp) {
                     $appointmentDate = Carbon::parse($request->appointment_date);
                     $status = $this->calculatePregnancyStatus($pregnancy_tracking->lmp, $appointmentDate);
-                    $pregnancy_tracking->update(['pregnancy_status' => $status]);
+                    $appointment->update(['pregnancy_status' => $status]);
                 }
             }
         });
