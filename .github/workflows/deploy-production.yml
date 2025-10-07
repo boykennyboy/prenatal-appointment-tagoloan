@@ -68,6 +68,7 @@ jobs:
           VITE_PUSHER_APP_CLUSTER: ${{ secrets.VITE_PUSHER_APP_CLUSTER }}
           VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
           VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL_PRODUCTION }}
         run: |
           cd frontend
           npm ci
