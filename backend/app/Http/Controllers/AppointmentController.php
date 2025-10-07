@@ -334,7 +334,7 @@ class AppointmentController extends Controller
     {
         $start = $request->input('start'); // YYYY-MM-DD
         $end = $request->input('end');     // YYYY-MM-DD
-        $maxSlots = 5; // This is the max slot to display in the calendar
+        $maxSlots = 7; // This is the max slot to display in the calendar
 
         // Get appointment counts
         $appointments = Appointment::selectRaw('DATE(appointment_date) as date, COUNT(*) as count')
