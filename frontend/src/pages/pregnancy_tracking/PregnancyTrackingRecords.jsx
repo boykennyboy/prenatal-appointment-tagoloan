@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { pdf } from '@react-pdf/renderer';
 import Container from '../../components/ui/Container';
 import DataTable from '../../components/ui/Datatable';
-import { pregnancy_tracking_columns } from '../../utils/columns';
+import { pickerOptions, pregnancy_tracking_columns } from '../../utils/columns';
 import { useAuthStore } from '../../store/authStore.js';
 import PregnancyTrackingPDF from '../../components/interfaces/pdf/PregnancyTrackingPDF.jsx';
 import { useFormSubmit } from '../../utils/functions.jsx';
@@ -150,6 +150,7 @@ const PregnancyTrackingRecords = () => {
                   <div className='flex-1 w-full'>
                     <DatePicker
                       hasLabel
+                      options={pickerOptions}
                       label='Date Delivery'
                       value={formData.date_delivery}
                       setFormData={setFormData}
