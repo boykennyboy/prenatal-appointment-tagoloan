@@ -72,10 +72,10 @@ jobs:
           VITE_PUSHER_PORT: ${{ secrets.VITE_PUSHER_PORT }}
           VITE_PUSHER_SCHEME: ${{ secrets.VITE_PUSHER_SCHEME }}
         run: |
-          cd frontend
+          cd frontend 
           npm ci
           echo "Building with Vite..."
-          npm run build
+          npm run build -- --mode staging
 
       - name: Verify frontend build output
         if: needs.detect.outputs.frontend == 'true'

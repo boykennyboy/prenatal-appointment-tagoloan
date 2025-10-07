@@ -72,7 +72,8 @@ jobs:
           cd frontend
           npm ci
           echo "Building production frontend..."
-          npm run build
+          npm run build -- --mode production
+
 
       - name: Verify frontend build output
         if: needs.detect.outputs.frontend == 'true'
