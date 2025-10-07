@@ -170,7 +170,7 @@ const Header = ({ mobileMenuOpen, setMobileMenuOpen }) => {
               {openNotification && (
                 <div
                   ref={notificationRef}
-                  className='absolute right-0 mt-3 w-80 sm:w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50'
+                  className='absolute -right-10 sm:right-0 mt-3 w-80 sm:w-96 bg-white rounded-xl shadow-lg border border-gray-200 z-50'
                 >
                   {/* Header */}
                   <div className='flex items-center justify-between p-4 border-b border-gray-100'>

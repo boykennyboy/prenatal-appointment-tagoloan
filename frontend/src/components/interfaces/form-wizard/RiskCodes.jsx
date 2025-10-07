@@ -3,6 +3,7 @@ import { ShieldAlert, Info, ChevronDown, ChevronUp } from 'lucide-react';
 import InputGroup from '../../ui/InputGroup';
 import DatePicker from '../../ui/DatePicker';
 import SelectGroup from '../../ui/SelectGroup';
+import { pickerOptions } from '../../../utils/columns';
 
 const RiskCodes = ({ formData, setFormData, error }) => {
   const [showLegend, setShowLegend] = useState(false);
@@ -151,6 +152,7 @@ const RiskCodes = ({ formData, setFormData, error }) => {
           </div>
           <div className='w-full'>
             <DatePicker
+              options={pickerOptions}
               hasLabel
               label={'Date Detected'}
               value={risk.date_detected || ''}

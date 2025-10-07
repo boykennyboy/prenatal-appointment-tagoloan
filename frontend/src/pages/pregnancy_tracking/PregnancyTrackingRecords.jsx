@@ -146,8 +146,8 @@ const PregnancyTrackingRecords = () => {
             <div className='flex flex-col bg-gray-50 rounded-lg sm:w-auto mb-2'>
               {/* Visit Date */}
               <div className='w-full  p-4 rounded-lg space-y-2 '>
-                <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
-                  <div className='flex-1'>
+                <div className='flex flex-col gap-2 sm:flex-row items-center justify-between sm:gap-4'>
+                  <div className='flex-1 w-full'>
                     <DatePicker
                       hasLabel
                       label='Date Delivery'
@@ -160,7 +160,7 @@ const PregnancyTrackingRecords = () => {
                       <p className='error mt-1'>{error.date_delivery[0]}</p>
                     )}
                   </div>
-                  <div className='flex-1'>
+                  <div className='flex-1 w-full'>
                     <InputGroup
                       name='place_of_delivery'
                       id='place_of_delivery'
@@ -177,7 +177,7 @@ const PregnancyTrackingRecords = () => {
                   </div>
                 </div>
                 <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
-                  <div className='flex-1'>
+                  <div className='flex-1 w-full'>
                     <SelectGroup
                       options={[
                         {
@@ -202,7 +202,7 @@ const PregnancyTrackingRecords = () => {
                     )}
                   </div>
 
-                  <div className='flex-1'>
+                  <div className='flex-1 w-full'>
                     <InputGroup
                       type='number'
                       step='0.1'
