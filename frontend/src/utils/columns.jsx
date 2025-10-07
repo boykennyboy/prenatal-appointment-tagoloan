@@ -1331,6 +1331,9 @@ export const pickerOptions = {
   mode: 'single',
   dateFormat: 'Y-m-d',
   altInput: true,
+   disable: [
+    (date) => false,
+  ],
 };
 
 export const pickerNoWeekendsOptions = {
