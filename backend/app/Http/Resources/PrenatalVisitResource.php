@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Appointment;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -15,19 +16,9 @@ class PrenatalVisitResource extends JsonResource
      */
     public function toArray($request)
     {
-
-        $referenceDate = Carbon::parse($this->created_at);
-        $lmp = Carbon::parse($this->pregnancy_tracking->lmp);
-        $weeks = $lmp->diffInWeeks($referenceDate);
-        $status = '';
-
-        if ($weeks <= 12) {
-            $status = 'first_trimester';
-        } elseif ($weeks <= 27) {
-            $status = 'second_trimester';
-        } elseif ($weeks <= 40) {
-            $status = 'third_trimester';
-        }
+            $appoinment = Appointment::where('pregnancy_tracking_id', $this->pregnancy_tracking_id)
+            ->whereDate('appointment_date', $this->created_at)
+            ->first();
 
         return [
             'id' => $this->id,
@@ -68,7 +59,7 @@ class PrenatalVisitResource extends JsonResource
             'abortion' => $this->pregnancy_tracking->abortion,
             'attended_by' => $this->pregnancy_tracking->attended_by,
             'doctor_name' => $this->pregnancy_tracking->doctor->fullname,
-            'pregnancy_status' => $status,
+            'pregnancy_status' => $appoinment->pregnancy_status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -1,7 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
-
+namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\GetAddressesNameResource;
 use App\Http\Resources\GetMidwivesAndBarangayWorkersResource;
@@ -24,9 +23,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
-class SelectAddressController extends Controller
+
+class FilterController extends Controller
 {
-    public function regions()
+      public function regions()
     {
         return Cache::remember('regions_select', 3600, function () {
             return Region::select('id', 'name')
@@ -242,4 +242,5 @@ class SelectAddressController extends Controller
             'data' => $has_midwife && $has_nurse,
         ];
     }
+    
 }
