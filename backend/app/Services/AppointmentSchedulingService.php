@@ -12,7 +12,7 @@ class AppointmentSchedulingService
     const SLOT_DURATION = 20; // minutes
     const START_TIME = '08:00';
     const END_TIME = '16:20';
-    const MAX_SLOTS_PER_DAY = 7; // This is the max slot per day to accept in the database
+    const MAX_SLOTS_PER_DAY = 5; // This is the max slot per day to accept in the database
 
     /**
      * Generate all possible time slots for a day
