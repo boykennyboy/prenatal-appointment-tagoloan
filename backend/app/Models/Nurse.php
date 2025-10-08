@@ -12,6 +12,7 @@ class Nurse extends Model
         'firstname',
         'lastname',
         'barangay_center_id',
+        'license_number'
     ];
 
     protected static function booted()

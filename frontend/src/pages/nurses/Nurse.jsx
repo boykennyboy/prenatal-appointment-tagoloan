@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { User } from 'lucide-react';
+import { IdCard, User } from 'lucide-react';
 import Container from '../../components/ui/Container';
 import DataTable from '../../components/ui/Datatable';
 import InputGroup from '../../components/ui/InputGroup';
@@ -16,6 +16,7 @@ const Nurse = () => {
     firstname: '',
     lastname: '',
     barangay_center_id: 0,
+    license_number: '',
   });
   const [nurseId, setNurseId] = useState(0);
   const dataTableRef = useRef();
@@ -35,6 +36,7 @@ const Nurse = () => {
       firstname: '',
       lastname: '',
       barangay_center_id: 0,
+      license_number: '',
     });
   };
 
@@ -46,6 +48,7 @@ const Nurse = () => {
       firstname: row.firstname,
       lastname: row.lastname,
       barangay_center_id: row.barangay_center_id,
+      license_number: row.license_number,
     });
 
     setIsOpen(true);
@@ -68,6 +71,7 @@ const Nurse = () => {
           firstname: '',
           lastname: '',
           barangay_center_id: 0,
+          license_number: '',
         });
         setError({});
         setIsOpen(false);
@@ -104,16 +108,16 @@ const Nurse = () => {
         title='Nurse Management'
         apiEndpoint='/api/nurses'
         columns={columns}
-        onEdit={handleEdit}
+        onEdit={user.role_id === 2 ? handleEdit : ''}
         customActions={false}
         showDateFilter={true}
         showSearch={true}
         showPagination={true}
         showPerPage={true}
-        showActions={true}
+        showActions={user.role_id === 2 ? true : false}
         defaultPerPage={10}
         onAdd={handleAdd}
-        addButton={user.role_id !== 3 ? 'Add Nurse' : ''}
+        addButton={user.role_id === 2 ? 'Add Nurse' : ''}
         ref={dataTableRef}
       />
       {isOpen && (
@@ -154,7 +158,22 @@ const Nurse = () => {
                   )}
                 </div>
               </div>
-
+            <div className='w-full'>
+                  <InputGroup
+                    type='text'
+                    name='license_number'
+                    value={formData.license_number}
+                    onChange={inputChange}
+                    placeholder='License Number'
+                    icon={<IdCard className='h-5 w-5 text-gray-400' />}
+                    id={'license_number'}
+                    hasLabel
+                    label={'License Number'}
+                  />
+                  {error.license_number && (
+                    <p className='error mt-4'>{error.license_number[0]}</p>
+                  )}
+                </div>
               {user.role_id !== 2 && (
                 <SelectReact
                   label='Heath Station'

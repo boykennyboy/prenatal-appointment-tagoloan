@@ -470,6 +470,9 @@ export const nurse_columns = [
     key: 'id',
     hidden: true,
   },
+  { key: 'license_number',
+    hidden: true
+  },
   {
     key: 'barangay_center_id',
     hidden: true,
@@ -520,6 +523,9 @@ export const midwife_columns = [
   {
     key: 'id',
     hidden: true,
+  },
+  { key: 'license_number',
+    hidden: true
   },
   {
     key: 'barangay_center_id',
