@@ -537,7 +537,7 @@ export const midwife_columns = [
     let colorClass = 'bg-gray-200 text-gray-800';
     let status = 'No License';
 
-    if (value === 'completed') {
+    if (value ) {
       colorClass = 'bg-green-100 text-green-800';
       status = 'Licensed';
     }
