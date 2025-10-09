@@ -454,6 +454,27 @@ export const nurse_columns = [
     width: 'w-[30%]',
   },
   {
+  key: 'license_number',
+  title: 'License',
+  sortable: false,
+  width: '10%',
+  render: (value) => {
+    let colorClass = 'bg-gray-200 text-gray-800';
+    let status = 'No License';
+
+    if (value ) {
+      colorClass = 'bg-green-100 text-green-800';
+      status = 'Licensed';
+    }
+
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
+        {status}
+      </span>
+    );
+  },
+},
+  {
     key: 'created_at',
     title: 'Created',
     sortable: true,
@@ -470,9 +491,9 @@ export const nurse_columns = [
     key: 'id',
     hidden: true,
   },
-  { key: 'license_number',
-    hidden: true
-  },
+  // { key: 'license_number',
+  //   hidden: true
+  // },
   {
     key: 'barangay_center_id',
     hidden: true,
