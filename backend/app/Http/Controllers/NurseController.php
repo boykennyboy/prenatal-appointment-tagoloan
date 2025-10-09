@@ -81,6 +81,7 @@ class NurseController extends Controller
             'firstname' => 'required|max:255',
             'lastname' => 'required|max:255',
             'barangay_center_id' => 'required|exists:barangay_centers,id',
+            'license_number' => 'required|max:255|unique:nurses,license_number',
         ]);
 
         DB::transaction(function () use ($request, $fields) {
@@ -126,6 +127,7 @@ class NurseController extends Controller
             'firstname' => 'required|max:255',
             'lastname' => 'required|max:255',
             'barangay_center_id' => 'required|exists:barangay_centers,id',
+            'license_number' => 'required|max:255|unique:nurses,license_number,' . $nurse->id,
         ]);
 
         DB::transaction(function () use ($request, $fields, $nurse) {

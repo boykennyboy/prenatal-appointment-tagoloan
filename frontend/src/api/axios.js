@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useAuthStore } from '../store/authStore.js';
 
 const api = axios.create({
-  baseURL: 'https://prenatal-appointment-tagoloan.com',
+  baseURL: import.meta.env.VITE_APP_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

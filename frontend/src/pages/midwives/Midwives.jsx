@@ -4,7 +4,7 @@ import DataTable from '../../components/ui/Datatable';
 import InputGroup from '../../components/ui/InputGroup';
 import { useFormSubmit } from '../../utils/functions';
 import FormModal from '../../components/ui/FormModal';
-import { User } from 'lucide-react';
+import { IdCard, User } from 'lucide-react';
 import SelectReact from '../../components/ui/SelectReact';
 import { midwife_columns } from '../../utils/columns';
 import { useAuthStore } from '../../store/authStore.js';
@@ -17,6 +17,7 @@ const Midwives = () => {
     firstname: '',
     lastname: '',
     barangay_center_id: 0,
+    license_number: '',
   });
   const [MidwifeId, setMidwifeId] = useState(0);
   const dataTableRef = useRef();
@@ -35,6 +36,7 @@ const Midwives = () => {
       firstname: '',
       lastname: '',
       barangay_center_id: 0,
+      license_number: '',
     });
   };
 
@@ -46,6 +48,7 @@ const Midwives = () => {
       firstname: row.firstname,
       lastname: row.lastname,
       barangay_center_id: row.barangay_center_id,
+      license_number: row.license_number,
     });
 
     setIsOpen(true);
@@ -68,6 +71,7 @@ const Midwives = () => {
           firstname: '',
           lastname: '',
           barangay_center_id: 0,
+          license_number: '',
         });
         setError({});
         setIsOpen(false);
@@ -104,16 +108,16 @@ const Midwives = () => {
         title='Midwives Management'
         apiEndpoint='/api/midwives'
         columns={columns}
-        onEdit={handleEdit}
+        onEdit={user.role_id === 2 ? handleEdit : ''}
         customActions={false}
         showDateFilter={true}
         showSearch={true}
         showPagination={true}
         showPerPage={true}
-        showActions={true}
+        showActions={user.role_id === 2 ? true : false}
         defaultPerPage={10}
         onAdd={handleAdd}
-        addButton={user.role_id !== 3 ? 'Add Midwife' : ''}
+        addButton={user.role_id === 2 ? 'Add Midwife' : ''}
         ref={dataTableRef}
       />
       {isOpen && (
@@ -154,7 +158,22 @@ const Midwives = () => {
                   )}
                 </div>
               </div>
-
+              <div className='w-full'>
+                  <InputGroup
+                    type='text'
+                    name='license_number'
+                    value={formData.license_number}
+                    onChange={inputChange}
+                    placeholder='License Number'
+                    icon={<IdCard className='h-5 w-5 text-gray-400' />}
+                    id={'license_number'}
+                    hasLabel
+                    label={'License Number'}
+                  />
+                  {error.license_number && (
+                    <p className='error mt-4'>{error.license_number[0]}</p>
+                  )}
+                </div>
               {user.role_id !== 2 && (
                 <SelectReact
                   label='Heath Station'

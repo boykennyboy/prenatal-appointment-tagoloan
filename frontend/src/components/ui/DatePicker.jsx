@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Calendar } from 'lucide-react';
-import 'flatpickr/dist/themes/material_blue.css';
 import Flatpickr from 'react-flatpickr';
-import cn from '../../utils/cn';
+import 'flatpickr/dist/themes/material_blue.css';
 
 const DatePicker = ({
   options,
@@ -24,14 +23,13 @@ const DatePicker = ({
   className,
 }) => {
   const [range, setRange] = useState([]);
-
   const pickerRef = useRef(null);
 
   useEffect(() => {
     function handleClickOutside(e) {
       if (pickerRef.current && !pickerRef.current.contains(e.target)) {
-        if (pickerRef.current._flatpickr) {
-          pickerRef.current._flatpickr.close();
+        if (pickerRef.current.flatpickr) {
+          pickerRef.current.flatpickr.close();
         }
       }
     }
@@ -47,7 +45,7 @@ const DatePicker = ({
       } else {
         onChange({
           target: {
-            name: instance.input.name,
+            name: name,
             value: dateStr,
           },
         });
@@ -69,6 +67,13 @@ const DatePicker = ({
     altInput: true,
     altFormat: 'M j, Y',
     dateFormat: dateFormat,
+    // Mobile-friendly options - CRITICAL FOR MOBILE
+    appendTo: document.body, // Append to body to avoid overflow issues
+    static: false, // Allow dynamic positioning
+    position: 'auto', // Auto-position based on available space
+    disableMobile: false, // Enable mobile mode
+    clickOpens: true, // Ensure clicking opens the calendar
+    allowInput: false, // Prevent manual input to avoid conflicts
   };
 
   if (disable_weekends) {
@@ -83,30 +88,32 @@ const DatePicker = ({
     picker_options.altFormat = 'H:i';
   }
 
+  if (options) {
+    picker_options = { ...picker_options, ...options };
+  }
+
+  // Merge with custom options if provided
+
   return (
-    <div className='flex flex-col gap-2 mt-4 w-full' ref={pickerRef}>
+    <div className='flex flex-col gap-2 mt-4 w-full'>
       {hasLabel && (
-        <label className='text-gray-700' htmlFor={id}>
+        <label className='text-gray-700 text-sm font-medium' htmlFor={id}>
           {label}
         </label>
       )}
-      <div className='relative'>
-        <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
+      <div className='relative' ref={pickerRef}>
+        <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-0'>
           <Calendar className='h-5 w-5 text-gray-400' />
         </div>
         <Flatpickr
-          value={value}
+          value={value || formData?.[name] || ''}
           id={id}
           name={name}
-          onChange={(selectedDates, dateStr, instance) =>
-            handleChange(selectedDates, dateStr, instance)
-          }
+          onChange={handleChange}
           options={picker_options}
-          className={cn(
-            'w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all cursor-pointer',
-            disabled && 'bg-gray-50 cursor-not-allowed',
-            className
-          )}
+          className={`w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all cursor-pointer ${
+            disabled ? 'bg-gray-50 cursor-not-allowed' : 'bg-white'
+          } ${className || ''}`}
           placeholder={placeholder}
           disabled={disabled}
         />

@@ -100,6 +100,7 @@ const HealthInformationStep = ({
         </div>
         <div className='w-full'>
           <DatePicker
+            options={pickerOptions}
             name='edc'
             id='edc'
             value={formData.edc}

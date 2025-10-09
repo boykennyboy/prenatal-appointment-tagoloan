@@ -22,6 +22,7 @@ class NurseResource extends JsonResource
             'barangay_center_id' => $this->barangay_center_id,
             'health_station' => $this->barangay_center->health_station,
             'address' => $this->barangay_center->address,
+            'license_number' => $this->license_number,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
