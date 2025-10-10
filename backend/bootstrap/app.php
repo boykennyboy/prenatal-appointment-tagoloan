@@ -17,9 +17,9 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
 
-        $schedule->command('app:send-appointment-reminders')->dailyAt('03:27');
-        $schedule->command('app:update-trimester')->dailyAt('10:00');
-        $schedule->command('app:update-missed-appointments')->dailyAt('03:30');
+        $schedule->command('app:send-appointment-reminders')->dailyAt('11:00');
+        $schedule->command('app:update-trimester')->dailyAt('18:00');
+        $schedule->command('app:update-missed-appointments')->dailyAt('11:02');
     })
     ->withBroadcasting(
         __DIR__ . '/../routes/channels.php',
