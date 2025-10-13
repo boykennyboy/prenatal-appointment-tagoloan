@@ -145,8 +145,25 @@ const styles = StyleSheet.create({
     fontSize: 9,
     marginBottom: 1,
   },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    fontSize: 9,
+    color: '#555',
+    borderTop: 1,
+    borderTopColor: '#000',
+    paddingTop: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
-
+const today = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  day: '2-digit',
+  year: 'numeric',
+});
 // PDF Document Component
 const OutPatientPDF = ({ formData = {} }) => (
   <Document>
@@ -295,6 +312,11 @@ const OutPatientPDF = ({ formData = {} }) => (
       <View style={styles.commentsSection}>
         <Text style={styles.commentsTitle}>Comments</Text>
       </View>
+      {/* Footer */}
+        <View style={styles.footer}>
+          <Text>Online Prenatal Appointment System</Text>
+          <Text>{today}</Text>
+        </View>
     </Page>
   </Document>
 );
