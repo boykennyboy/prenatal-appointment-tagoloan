@@ -146,8 +146,25 @@ const styles = StyleSheet.create({
     minHeight: 15,
     paddingLeft: 5,
   },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    fontSize: 9,
+    color: '#555',
+    borderTop: 1,
+    borderTopColor: '#000',
+    paddingTop: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
-
+const today = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  day: '2-digit',
+  year: 'numeric',
+});
 // PDF Document Component
 const ImmunizationPDF = ({ formData = {} }) => (
   <Document>
@@ -307,6 +324,11 @@ const ImmunizationPDF = ({ formData = {} }) => (
           </Text>
         </View>
       </View>
+      {/* Footer */}
+        <View style={styles.footer}>
+          <Text>Online Prenatal Appointment System</Text>
+          <Text>{today}</Text>
+        </View>
     </Page>
   </Document>
 );

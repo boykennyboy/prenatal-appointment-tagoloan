@@ -169,8 +169,25 @@ const styles = StyleSheet.create({
     fontSize: 7,
     marginBottom: 1,
   },
+  footer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    fontSize: 9,
+    color: '#555',
+    borderTop: 1,
+    borderTopColor: '#000',
+    paddingTop: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
 });
-
+const today = new Date().toLocaleDateString('en-US', {
+  month: 'long',
+  day: '2-digit',
+  year: 'numeric',
+});
 const PregnancyTrackingPDF = ({ formData, patientType }) => {
   const currentYear = new Date().getFullYear();
 
@@ -854,6 +871,11 @@ const PregnancyTrackingPDF = ({ formData, patientType }) => {
               <Text style={styles.infoValue2}>E = Others</Text>
             </View>
           </View>
+        </View>
+        {/* Footer */}
+        <View style={styles.footer}>
+          <Text>Online Prenatal Appointment System</Text>
+          <Text>{today}</Text>
         </View>
       </Page>
     </Document>

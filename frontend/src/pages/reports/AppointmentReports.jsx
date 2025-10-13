@@ -270,7 +270,7 @@ const AppointmentReports = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Prenatl_Visit_Report_${
+      a.download = `Appointment_Report_${
         new Date().toISOString().split('T')[0]
       }.xlsx`;
       document.body.appendChild(a);
