@@ -78,33 +78,58 @@ const PrenatalVisits = () => {
     }));
   };
 
-  const handelDownload = async (row) => {
-    const response = await api.get(
-      `/api/group-prenatal-visits/${row.pregnancy_tracking_id}`
-    );
+ const handelDownload = async (row) => {
+    try {
+      const response = await api.get(
+        `/api/group-prenatal-visits/${row.pregnancy_tracking_id}`
+      );
 
-    const data = response.data;
+      const data = response.data;
 
-    console.log('PDF: ', data.data);
+      const blob = await pdf(
+        <PrenatalVisitPDF formData={data.data || data} />
+      ).toBlob();
 
-    const blob = await pdf(
-      <PrenatalVisitPDF formData={data.data || data} />
-    ).toBlob();
+      // Create a proper blob with correct MIME type
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
 
-    const url = URL.createObjectURL(blob);
+      // Open in new tab
+      window.open(url, '_blank');
 
-    // ✅ Trigger browser download
-    // const link = document.createElement('a');
-    // link.href = url;
-    // link.download = 'pregnancy-tracking.pdf'; // filename
-    // document.body.appendChild(link);
-    // link.click();
-    // document.body.removeChild(link);
-
-    window.open(url, '_blank');
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // Don't revoke - let it persist
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+    }
   };
+
+  // const handelDownload = async (row) => {
+  //   const response = await api.get(
+  //     `/api/group-prenatal-visits/${row.pregnancy_tracking_id}`
+  //   );
+
+  //   const data = response.data;
+
+  //   console.log('PDF: ', data.data);
+
+  //   const blob = await pdf(
+  //     <PrenatalVisitPDF formData={data.data || data} />
+  //   ).toBlob();
+
+  //   const url = URL.createObjectURL(blob);
+
+  //   // ✅ Trigger browser download
+  //   // const link = document.createElement('a');
+  //   // link.href = url;
+  //   // link.download = 'pregnancy-tracking.pdf'; // filename
+  //   // document.body.appendChild(link);
+  //   // link.click();
+  //   // document.body.removeChild(link);
+
+  //   window.open(url, '_blank');
+
+  //   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // };
 
   const columns = prenatal_visit_column;
 

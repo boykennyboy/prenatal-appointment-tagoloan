@@ -50,22 +50,41 @@ const ImmunizationRecords = () => {
   };
 
   const handelDownload = async (row) => {
-    const blob = await pdf(<ImmunizationPDF formData={row} />).toBlob();
+    try {
+      const blob = await pdf(
+        <ImmunizationPDF formData={row} />
+      ).toBlob();
 
-    const url = URL.createObjectURL(blob);
+      // Create a proper blob with correct MIME type
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
 
-    // ✅ Trigger browser download
-    // const link = document.createElement('a');
-    // link.href = url;
-    // link.download = 'pregnancy-tracking.pdf'; // filename
-    // document.body.appendChild(link);
-    // link.click();
-    // document.body.removeChild(link);
+      // Open in new tab
+      window.open(url, '_blank');
 
-    window.open(url, '_blank');
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // Don't revoke - let it persist
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+    }
   };
+
+  // const handelDownload = async (row) => {
+  //   const blob = await pdf(<ImmunizationPDF formData={row} />).toBlob();
+
+  //   const url = URL.createObjectURL(blob);
+
+  //   // ✅ Trigger browser download
+  //   // const link = document.createElement('a');
+  //   // link.href = url;
+  //   // link.download = 'pregnancy-tracking.pdf'; // filename
+  //   // document.body.appendChild(link);
+  //   // link.click();
+  //   // document.body.removeChild(link);
+
+  //   window.open(url, '_blank');
+
+  //   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // };
 
   const handleAdd = () => {
     setIsEdit(false);
