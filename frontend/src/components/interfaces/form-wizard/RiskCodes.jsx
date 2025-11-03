@@ -57,43 +57,100 @@ const RiskCodes = ({ formData, setFormData, error }) => {
 
   const risk_code_options = [
     {
+      value: 'A',
       name: 'A = an age less than 18 years old',
     },
     {
+      value: 'B',
       name: 'B = an age more than 35 years old',
     },
     {
+      value: 'C',
       name: 'C = being less than 145 cm (4\'9") tall',
     },
     {
+      value: 'D',
       name: 'D = having fourth or more baby or so called grand multi',
     },
     {
+      value: 'E (a)',
       name: 'E (a) = a previous caesarean section',
     },
     {
+      value: 'E (b)',
       name: 'E (b) = 3 consecutive miscarriages or still-born baby',
     },
     {
+      value: 'E (c)',
       name: 'E (c) = postpartum hemorrhage',
     },
     {
+      value: 'F (1)',
       name: 'F (1) = Tuberculosis',
     },
     {
+      value: 'F (2)',
       name: 'F (2) = Heart Disease',
     },
     {
+      value: 'F (3)',
       name: 'F (3) = Diabetes',
     },
     {
+      value: 'F (4)',
       name: 'F (4) = Bronchial Asthma',
     },
     {
+      value: 'F (5)',
       name: 'F (5) = Goiter',
     },
   ];
 
+  const getRiskCodeOptions = (risk_code_options, risks, index, formData) => {
+    // Compute age from birth_date
+    const birthDate = formData?.birth_date
+      ? new Date(formData.birth_date)
+      : null;
+    const today = new Date();
+    const age = birthDate
+      ? today.getFullYear() -
+        birthDate.getFullYear() -
+        (today <
+        new Date(today.getFullYear(), birthDate.getMonth(), birthDate.getDate())
+          ? 1
+          : 0)
+      : null;
+
+    return risk_code_options.filter((opt) => {
+      const selectedCodes = risks
+        .filter((_, i) => i !== index)
+        .map((r) => r.risk_code);
+
+      // A-B exclusivity
+      if (selectedCodes.includes('A') && opt.value === 'B') return false;
+      if (selectedCodes.includes('B') && opt.value === 'A') return false;
+
+      // Hide duplicates
+      if (selectedCodes.includes(opt.value)) return false;
+
+      // Hide A if age is >= 18 (A is for age < 18)
+      if (age !== null && age >= 18 && opt.value === 'A') {
+        return false;
+      }
+
+      // Hide B if age is <= 35 (B is for age > 35)
+      if (age !== null && age <= 35 && opt.value === 'B') {
+        return false;
+      }
+
+      // Hide D if gravidity is less than 4
+      if (formData.gravidity < 4 && opt.value === 'D') {
+        return false;
+      }
+
+      return true;
+    });
+  };
   return (
     <div className='space-y-4'>
       {/* Legend Toggle */}
@@ -113,19 +170,33 @@ const RiskCodes = ({ formData, setFormData, error }) => {
         </button>
 
         {showLegend && (
-          <div className='mt-4 space-y-4'>
-            <div>
-              <h4 className='font-semibold text-gray-800 mb-2'>Risk Codes:</h4>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-2 text-sm'>
-                {Object.entries(riskCodeLegend).map(([code, description]) => (
-                  <div key={code} className='flex gap-2'>
-                    <span className='font-mono font-bold text-blue-600 min-w-[20px]'>
-                      {code} =
-                    </span>
-                    <span className='text-gray-700'>{description}</span>
-                  </div>
-                ))}
-              </div>
+          <div className='mt-4'>
+            <h4 className='font-semibold text-gray-800 mb-2'>Risk Codes:</h4>
+            <div className='overflow-x-auto'>
+              <table className='min-w-full border border-gray-300'>
+                <thead>
+                  <tr className='bg-gray-100'>
+                    <th className='border border-gray-300 px-4 py-2 text-left font-semibold text-gray-800'>
+                      Code
+                    </th>
+                    <th className='border border-gray-300 px-4 py-2 text-left font-semibold text-gray-800'>
+                      Description
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Object.entries(riskCodeLegend).map(([code, description]) => (
+                    <tr key={code} className='hover:bg-gray-50'>
+                      <td className='border border-gray-300 px-4 py-2 font-mono font-bold text-blue-600'>
+                        {code}
+                      </td>
+                      <td className='border border-gray-300 px-4 py-2 text-gray-700'>
+                        {description}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -135,15 +206,29 @@ const RiskCodes = ({ formData, setFormData, error }) => {
       {risks.map((risk, index) => (
         <div key={index} className='flex gap-4 items-center rounded-lg'>
           <div className='w-full'>
-            <SelectGroup
+            {/* <SelectGroup
               hasLabel
               label={'Select Risk Code'}
               value={risk.risk_code || ''}
               options={risk_code_options}
               onChange={(e) => handleChange(index, 'risk_code', e.target.value)}
               placeholder='Select Risk Code'
-            />
+            /> */}
 
+            <SelectGroup
+              hasLabel
+              label={'Select Risk Code'}
+              value={risk.risk_code || ''}
+              options={getRiskCodeOptions(
+                risk_code_options,
+                risks,
+                index,
+                formData
+              )}
+              onChange={(e) => handleChange(index, 'risk_code', e.target.value)}
+              placeholder='Select Risk Code'
+              disabled={risk.auto}
+            />
             {error?.[`risk_codes.${index}.risk_code`] && (
               <p className='text-red-500 text-sm mt-1'>
                 {error[`risk_codes.${index}.risk_code`][0]}
@@ -166,7 +251,7 @@ const RiskCodes = ({ formData, setFormData, error }) => {
               </p>
             )}
           </div>
-          {risks.length > 1 && (
+          {risks.length > 1 && !risk.auto && (
             <button
               type='button'
               onClick={() => removeRisk(index)}

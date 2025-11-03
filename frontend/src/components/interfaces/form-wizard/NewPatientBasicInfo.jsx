@@ -7,6 +7,53 @@ import DatePicker from '../../ui/DatePicker';
 import { pickerOptions } from '../../../utils/columns';
 
 const NewPatientBasicInfo = ({ formData, inputChange, error, setFormData }) => {
+  const handle_birth_date = (value) => {
+    // Calculate age
+    const birthDate = new Date(value);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    setFormData((prev) => {
+      let updatedRiskCodes = [...(prev.risk_codes || [])];
+
+      // Remove A or B if previously added
+      updatedRiskCodes = updatedRiskCodes.filter(
+        (r) => r.risk_code !== 'A' && r.risk_code !== 'B'
+      );
+
+      // Add A or B depending on age
+      if (age < 18) {
+        updatedRiskCodes.push({
+          risk_code: 'A',
+          date_detected: '',
+          risk_status: '',
+          auto: true,
+        });
+      } else if (age > 35) {
+        updatedRiskCodes.push({
+          risk_code: 'B',
+          date_detected: '',
+          risk_status: '',
+          auto: true,
+        });
+      }
+
+      return {
+        ...prev,
+        birth_date: value,
+        risk_codes: updatedRiskCodes,
+      };
+    });
+  };
+
   return (
     <div className='flex flex-col gap-6'>
       {/* Row 1: Fname, Lname, Mname */}
@@ -72,7 +119,7 @@ const NewPatientBasicInfo = ({ formData, inputChange, error, setFormData }) => {
             name='birth_date'
             id='birth_date'
             value={formData.birth_date}
-            onChange={inputChange}
+            onChange={(e) => handle_birth_date(e.target.value)}
             placeholder='Birth date'
             hasLabel
             label='Birth Date'

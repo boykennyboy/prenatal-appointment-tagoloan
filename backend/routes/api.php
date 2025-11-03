@@ -15,6 +15,7 @@ use App\Http\Controllers\NurseController;
 use App\Http\Controllers\OutPatientController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PregnancyTrackingController;
+use App\Http\Controllers\PrenatalOutPatientImmunizationController;
 use App\Http\Controllers\PrenatalVisitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
@@ -65,7 +66,9 @@ Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
     // Delete all read notifications
     Route::delete('/notifications/delete-all-read', [NotificationController::class, 'deleteAllRead']);
 
-    
+
+    Route::post('/unified-form/store', [PrenatalOutPatientImmunizationController::class, 'store']);
+    Route::put('/unified-form/update/{id}', [PrenatalOutPatientImmunizationController::class, 'update']);
     Route::put('/edit/pregnancy-trackings/{pregnancy_tracking}', [PregnancyTrackingController::class, 'update_pregnancy']);
     Route::get('/select-address/regions', [SelectAddressController::class, 'regions']);
     Route::get('/select-address/provinces/{region}', [SelectAddressController::class, 'provinces']);
@@ -83,4 +86,6 @@ Route::middleware(['throttle:api', 'auth:sanctum'])->group(function () {
     Route::get('/available-appointments', [AppointmentController::class, 'getAvailabilityByRange']);
     Route::get('/group-prenatal-visits/{id}', [PrenatalVisitController::class, 'getGroupPrenatalVisit']);
     Route::get('/nurse-and-midwife-existence', [SelectAddressController::class, 'checkNurseMidwifeExistence']);
+    Route::get('/filter/visit-count', [SelectAddressController::class, 'visit_count']);
+    Route::get('/filter/existing-patient', [SelectAddressController::class, 'existing_patient']);
 });

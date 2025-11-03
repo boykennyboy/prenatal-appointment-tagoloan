@@ -53,6 +53,7 @@ class StorePregnancyTrackingRequest extends FormRequest
         if ($patientType === 'existing') {
             $rules = array_merge($rules, [
                 'patient_id'                => 'required|exists:patients,id',
+                'birth_date'                => 'required|date',
             ]);
         }
 

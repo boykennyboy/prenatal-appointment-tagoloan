@@ -209,6 +209,17 @@ const today = new Date().toLocaleDateString('en-US', {
   day: '2-digit',
   year: 'numeric',
 });
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-CA', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+};
+
 const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
   // Always convert formData into an array of visits
   const visitsArray = Array.isArray(formData) ? formData : [formData];
@@ -242,7 +253,6 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
   const renderVisitCells = (visits, maxCount, isLastTrimester = false) => {
     const cells = [];
 
-    // Fill with actual visit data
     for (let i = 0; i < maxCount; i++) {
       const visit = visits[i];
       cells.push(
@@ -253,7 +263,14 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
             isLastTrimester && i === maxCount - 1 ? styles.lastVisitCell : {},
           ]}
         >
-          {visit && <Text style={styles.cellText}>{visit.value || ''}</Text>}
+          {visit && (
+            <Text style={styles.cellText}>
+              {/* Format only the date field */}
+              {visit.label === 'DATE'
+                ? formatDate(visit.value)
+                : visit.value || ''}
+            </Text>
+          )}
         </View>
       );
     }
@@ -262,15 +279,17 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
   };
 
   const renderDataRow = (label, dataKey, isLast = false) => {
-    // Extract data for each trimester
     const firstTrimesterData = first.map((visit) => ({
       value: visit[dataKey] || '',
+      label,
     }));
     const secondTrimesterData = second.map((visit) => ({
       value: visit[dataKey] || '',
+      label,
     }));
     const thirdTrimesterData = third.map((visit) => ({
       value: visit[dataKey] || '',
+      label,
     }));
 
     return (
@@ -341,7 +360,9 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
             </View>
             <Text style={styles.label}>DATE OF BIRTH:</Text>
             <View style={[styles.underline, styles.mediumUnderline]}>
-              <Text style={styles.dataText}>{patient.birth_date || ''}</Text>
+              <Text style={styles.dataText}>
+                {formatDate(patient.birth_date) || ''}
+              </Text>
             </View>
             <Text style={styles.label}>CONTACT NO:</Text>
             <View style={[styles.underline, styles.mediumUnderline]}>
@@ -461,14 +482,18 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
           <View style={styles.formRow}>
             <Text style={styles.label}>LMP:</Text>
             <View style={[styles.underline, styles.mediumUnderline]}>
-              <Text style={styles.dataText}>{patient.lmp || ''}</Text>
+              <Text style={styles.dataText}>
+                {formatDate(patient.lmp) || ''}
+              </Text>
             </View>
           </View>
 
           <View style={styles.formRow}>
             <Text style={styles.label}>EDC:</Text>
             <View style={[styles.underline, styles.mediumUnderline]}>
-              <Text style={styles.dataText}>{patient.edc || ''}</Text>
+              <Text style={styles.dataText}>
+                {formatDate(patient.edc) || ''}
+              </Text>
             </View>
           </View>
         </View>
@@ -510,6 +535,44 @@ const PrenatalVisitPDF = ({ formData = {}, patientData = {} }) => {
             {renderDataRow('AOG', 'aog', true)}
           </View>
         </View>
+
+        <View
+          style={{
+            marginTop: 130,
+            marginBottom: 12,
+            marginLeft: 5,
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            width: '100%',
+          }}
+        >
+          <View style={{ width: '50%', paddingRight: 10 }}>
+            <Text style={{ fontSize: 8 }}>
+              G – Gravidity (number of pregnancies)
+            </Text>
+          </View>
+          <View style={{ width: '50%' }}>
+            <Text style={{ fontSize: 8 }}>
+              T – Term (number of full-term births)
+            </Text>
+          </View>
+          <View style={{ width: '50%', paddingRight: 10, marginTop: 2 }}>
+            <Text style={{ fontSize: 8 }}>
+              P – Preterm (number of preterm births)
+            </Text>
+          </View>
+          <View style={{ width: '50%', marginTop: 2 }}>
+            <Text style={{ fontSize: 8 }}>
+              A – Abortion (number of miscarriages or abortions)
+            </Text>
+          </View>
+          <View style={{ width: '50%', paddingRight: 10, marginTop: 2 }}>
+            <Text style={{ fontSize: 8 }}>
+              L – Living (number of living children)
+            </Text>
+          </View>
+        </View>
+
         {/* Footer */}
         <View style={styles.footer}>
           <Text>Online Prenatal Appointment System</Text>

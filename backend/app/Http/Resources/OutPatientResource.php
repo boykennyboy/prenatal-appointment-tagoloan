@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\PrenatalVisit;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -14,6 +15,11 @@ class OutPatientResource extends JsonResource
      */
     public function toArray($request): array
     {
+
+        $prenatal_visit = PrenatalVisit::where('pregnancy_tracking_id', $this->pregnancy_tracking_id)
+            ->latest()
+            ->first();
+
         return [
             'id' => $this->id,
             'pregnancy_tracking_id' => $this->pregnancy_tracking_id,
@@ -47,6 +53,13 @@ class OutPatientResource extends JsonResource
             'pr' => $this->pr,
             'two_sat' => $this->two_sat,
             'bp' => $this->bp,
+            'fht' => $prenatal_visit->fht,
+            'fh' => $prenatal_visit->fh,
+            'aog' => $prenatal_visit->aog,
+            'term' => $prenatal_visit->term,
+            'preterm' => $prenatal_visit->preterm,
+            'post_term' => $prenatal_visit->post_term,
+            'living_children' => $prenatal_visit->living_children,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -9,10 +9,11 @@ import PregnancyTrackingPDF from '../../components/interfaces/pdf/PregnancyTrack
 import { useFormSubmit } from '../../utils/functions.jsx';
 import DatePicker from '../../components/ui/DatePicker.jsx';
 import InputGroup from '../../components/ui/InputGroup.jsx';
-import { Map, User, Weight } from 'lucide-react';
+import { Map, User, Weight, CheckCircle, XCircle } from 'lucide-react';
 import SelectGroup from '../../components/ui/SelectGroup.jsx';
 import FormModal from '../../components/ui/FormModal.jsx';
 import api from '../../api/axios.js';
+import { toast } from 'sonner';
 
 const PregnancyTrackingRecords = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const PregnancyTrackingRecords = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [pregnancyTrackingId, setPregnancyTrackingId] = useState(0);
+  const [outcomeType, setOutcomeType] = useState(null); // 'successful' or 'miscarriage'
   const [formData, setFormData] = useState({
     date_delivery: '',
     outcome_sex: '',
@@ -35,10 +37,16 @@ const PregnancyTrackingRecords = () => {
 
   const closeModal = () => {
     setIsOpen(false);
-
     setError({});
     setPregnancyTrackingId(0);
-    setFormData(outPatientFormData);
+    setOutcomeType(null);
+    setFormData({
+      date_delivery: '',
+      outcome_sex: '',
+      outcome_weight: '',
+      place_of_delivery: '',
+      phic: 0,
+    });
   };
 
   const handleEdit = (row) => {
@@ -62,6 +70,32 @@ const PregnancyTrackingRecords = () => {
     navigate('create');
   };
 
+  const handleOutcomeSelection = async (type) => {
+    if (type === 'miscarriage') {
+      // Update pregnancy tracking as miscarriage/abortion
+      try {
+        const response = await api.put(
+          `/api/edit/pregnancy-trackings/${pregnancyTrackingId}`,
+          { outcome_type: 'miscarriage' }
+        );
+
+        if (response.data) {
+          dataTableRef.current?.fetchData();
+          closeModal();
+          toast.success(
+            response.data.message ||
+              'Miscarriage/Abortion updated successfully!'
+          );
+        }
+      } catch (err) {
+        console.error('Error updating pregnancy tracking:', err);
+        toast.error('Something went wrong when updating record!');
+      }
+    } else {
+      setOutcomeType(type);
+    }
+  };
+
   const onSubmit = (e) => {
     handleSubmit({
       e,
@@ -73,6 +107,7 @@ const PregnancyTrackingRecords = () => {
         setError({});
         setPregnancyTrackingId(0);
         setIsOpen(false);
+        setOutcomeType(null);
         setFormData({
           date_delivery: '',
           outcome_sex: '',
@@ -88,45 +123,21 @@ const PregnancyTrackingRecords = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  
+
   const handelDownload = async (row) => {
     try {
       const blob = await pdf(
         <PregnancyTrackingPDF formData={row} patientType={''} />
       ).toBlob();
 
-      // Create a proper blob with correct MIME type
       const pdfBlob = new Blob([blob], { type: 'application/pdf' });
       const url = URL.createObjectURL(pdfBlob);
 
-      // Open in new tab
       window.open(url, '_blank');
-
-      // Don't revoke - let it persist
     } catch (error) {
       console.error('PDF generation failed:', error);
     }
   };
-
-  // const handelDownload = async (row) => {
-  //   const blob = await pdf(
-  //     <PregnancyTrackingPDF formData={row} patientType={''} />
-  //   ).toBlob();
-
-  //   const url = URL.createObjectURL(blob);
-
-  //   // ✅ Trigger browser download
-  //   // const link = document.createElement('a');
-  //   // link.href = url;
-  //   // link.download = 'pregnancy-tracking.pdf'; // filename
-  //   // document.body.appendChild(link);
-  //   // link.click();
-  //   // document.body.removeChild(link);
-
-  //   window.open(url, '_blank');
-
-  //   setTimeout(() => URL.revokeObjectURL(url), 1000);
-  // };
 
   const columns = pregnancy_tracking_columns;
 
@@ -161,129 +172,178 @@ const PregnancyTrackingRecords = () => {
           isEdit={true}
           title={'Pregnancy Tracking'}
         >
-          <form onSubmit={onSubmit}>
-            <div className='flex flex-col bg-gray-50 rounded-lg sm:w-auto mb-2'>
-              {/* Visit Date */}
-              <div className='w-full  p-4 rounded-lg space-y-2 '>
-                <div className='flex flex-col gap-2 sm:flex-row items-center justify-between sm:gap-4'>
-                  <div className='flex-1 w-full'>
-                    <DatePicker
-                      hasLabel
-                      options={pickerOptions}
-                      label='Date Delivery'
-                      value={formData.date_delivery}
-                      setFormData={setFormData}
-                      id='date_delivery'
-                      name='date_delivery'
-                    />
-                    {error.date_delivery && (
-                      <p className='error mt-1'>{error.date_delivery[0]}</p>
-                    )}
-                  </div>
-                  <div className='flex-1 w-full'>
-                    <InputGroup
-                      name='place_of_delivery'
-                      id='place_of_delivery'
-                      value={formData.place_of_delivery}
-                      onChange={inputChange}
-                      placeholder='Enter place of delivery'
-                      icon={<Map className='h-5 w-5 text-gray-400' />}
-                      hasLabel
-                      label='Place of Delivery'
-                    />
-                    {error.place_of_delivery && (
-                      <p className='error mt-1'>{error.place_of_delivery[0]}</p>
-                    )}
-                  </div>
-                </div>
-                <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
-                  <div className='flex-1 w-full'>
-                    <SelectGroup
-                      options={[
-                        {
-                          name: 'Male',
-                          value: 'male',
-                        },
-                        {
-                          name: 'Female',
-                          value: 'female',
-                        },
-                      ]}
-                      placeholder='Select Gender'
-                      value={formData.outcome_sex}
-                      onChange={inputChange}
-                      id='outcome_sex'
-                      name='outcome_sex'
-                      label='Outcome Sex'
-                      hasLabel
-                    />
-                    {error.outcome_sex && (
-                      <p className='error mt-1'>{error.outcome_sex[0]}</p>
-                    )}
-                  </div>
+          {!outcomeType ? (
+            // Outcome Selection Screen
+            <div className='space-y-4 p-4'>
+              <h3 className='text-lg font-semibold text-gray-800 text-center mb-6'>
+                Select Pregnancy Outcome
+              </h3>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <button
+                  onClick={() => handleOutcomeSelection('successful')}
+                  className='flex flex-col items-center justify-center p-6 border-2 border-green-300 rounded-lg hover:bg-green-50 hover:border-green-500 transition-all duration-200 group'
+                >
+                  <CheckCircle className='h-12 w-12 text-green-500 mb-3 group-hover:scale-110 transition-transform' />
+                  <span className='text-lg font-semibold text-gray-800'>
+                    Successful Delivery
+                  </span>
+                  <span className='text-sm text-gray-600 mt-2 text-center'>
+                    Record delivery details and outcome
+                  </span>
+                </button>
 
-                  <div className='flex-1 w-full'>
-                    <InputGroup
-                      type='number'
-                      step='0.1'
-                      name='outcome_weight'
-                      id='outcome_weight'
-                      value={formData.outcome_weight}
-                      onChange={inputChange}
-                      placeholder='Enter weight'
-                      icon={<Weight className='h-5 w-5 text-gray-400' />}
-                      hasLabel
-                      label='Weight (kg)'
-                    />
-                    {error.outcome_weight && (
-                      <p className='error mt-1'>{error.outcome_weight[0]}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              {/* Vital Signs Section */}
-              <div className='bg-gray-50 p-4 rounded-lg w-full mb-4'>
-                <div className='grid grid-cols-1 gap-4'>
-                  <div className='-mt-5'>
-                    <SelectGroup
-                      options={[
-                        {
-                          name: 'Yes',
-                          value: 1,
-                        },
-                        {
-                          name: 'No',
-                          value: 0,
-                        },
-                      ]}
-                      placeholder='Has PhilHealth?'
-                      value={formData.phic}
-                      onChange={inputChange}
-                      id='phic'
-                      name='phic'
-                      label='Has PhilHealth?'
-                      hasLabel
-                    />
-                    {error.phic && (
-                      <p className='error mt-1'>{error.phic[0]}</p>
-                    )}
-                  </div>
-                </div>
+                <button
+                  onClick={() => handleOutcomeSelection('miscarriage')}
+                  className='flex flex-col items-center justify-center p-6 border-2 border-red-300 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all duration-200 group'
+                >
+                  <XCircle className='h-12 w-12 text-red-500 mb-3 group-hover:scale-110 transition-transform' />
+                  <span className='text-lg font-semibold text-gray-800'>
+                    Miscarriage or Abortion
+                  </span>
+                  <span className='text-sm text-gray-600 mt-2 text-center'>
+                    Update record as miscarriage/abortion
+                  </span>
+                </button>
               </div>
             </div>
-            <button
-              disabled={isSubmitting}
-              className={`w-full bg-gradient-to-r text-white py-3 rounded-lg font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg 
-              ${
-                isSubmitting
-                  ? 'from-purple-300 to-pink-300 cursor-not-allowed'
-                  : 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
-              }`}
-            >
-              {isSubmitting ? 'Updating ...' : 'Update Pregnancy Tracking'}
-            </button>
-          </form>
+          ) : (
+            // Original Form for Successful Delivery
+            <form onSubmit={onSubmit}>
+              <div className='mb-4'>
+                <button
+                  type='button'
+                  onClick={() => setOutcomeType(null)}
+                  className='text-sm text-purple-600 hover:text-purple-800 font-medium'
+                >
+                  ← Back to outcome selection
+                </button>
+              </div>
+
+              <div className='flex flex-col bg-gray-50 rounded-lg sm:w-auto mb-2'>
+                {/* Visit Date */}
+                <div className='w-full p-4 rounded-lg space-y-2'>
+                  <div className='flex flex-col gap-2 sm:flex-row items-center justify-between sm:gap-4'>
+                    <div className='flex-1 w-full'>
+                      <DatePicker
+                        hasLabel
+                        options={pickerOptions}
+                        label='Date Delivery'
+                        value={formData.date_delivery}
+                        setFormData={setFormData}
+                        id='date_delivery'
+                        name='date_delivery'
+                      />
+                      {error.date_delivery && (
+                        <p className='error mt-1'>{error.date_delivery[0]}</p>
+                      )}
+                    </div>
+                    <div className='flex-1 w-full'>
+                      <InputGroup
+                        name='place_of_delivery'
+                        id='place_of_delivery'
+                        value={formData.place_of_delivery}
+                        onChange={inputChange}
+                        placeholder='Enter place of delivery'
+                        icon={<Map className='h-5 w-5 text-gray-400' />}
+                        hasLabel
+                        label='Place of Delivery'
+                      />
+                      {error.place_of_delivery && (
+                        <p className='error mt-1'>
+                          {error.place_of_delivery[0]}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className='flex flex-col sm:flex-row items-center justify-between gap-4'>
+                    <div className='flex-1 w-full'>
+                      <SelectGroup
+                        options={[
+                          {
+                            name: 'Male',
+                            value: 'male',
+                          },
+                          {
+                            name: 'Female',
+                            value: 'female',
+                          },
+                        ]}
+                        placeholder='Select Gender'
+                        value={formData.outcome_sex}
+                        onChange={inputChange}
+                        id='outcome_sex'
+                        name='outcome_sex'
+                        label='Outcome Sex'
+                        hasLabel
+                      />
+                      {error.outcome_sex && (
+                        <p className='error mt-1'>{error.outcome_sex[0]}</p>
+                      )}
+                    </div>
+
+                    <div className='flex-1 w-full'>
+                      <InputGroup
+                        type='number'
+                        step='0.1'
+                        name='outcome_weight'
+                        id='outcome_weight'
+                        value={formData.outcome_weight}
+                        onChange={inputChange}
+                        placeholder='Enter weight'
+                        icon={<Weight className='h-5 w-5 text-gray-400' />}
+                        hasLabel
+                        label='Weight (kg)'
+                      />
+                      {error.outcome_weight && (
+                        <p className='error mt-1'>{error.outcome_weight[0]}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vital Signs Section */}
+                <div className='bg-gray-50 p-4 rounded-lg w-full mb-4'>
+                  <div className='grid grid-cols-1 gap-4'>
+                    <div className='-mt-5'>
+                      <SelectGroup
+                        options={[
+                          {
+                            name: 'Yes',
+                            value: 1,
+                          },
+                          {
+                            name: 'No',
+                            value: 0,
+                          },
+                        ]}
+                        placeholder='Has PhilHealth?'
+                        value={formData.phic}
+                        onChange={inputChange}
+                        id='phic'
+                        name='phic'
+                        label='Has PhilHealth?'
+                        hasLabel
+                      />
+                      {error.phic && (
+                        <p className='error mt-1'>{error.phic[0]}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <button
+                disabled={isSubmitting}
+                className={`w-full bg-gradient-to-r text-white py-3 rounded-lg font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg 
+                ${
+                  isSubmitting
+                    ? 'from-purple-300 to-pink-300 cursor-not-allowed'
+                    : 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700'
+                }`}
+              >
+                {isSubmitting ? 'Updating ...' : 'Update Pregnancy Tracking'}
+              </button>
+            </form>
+          )}
         </FormModal>
       )}
     </Container>

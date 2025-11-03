@@ -28,6 +28,8 @@ const AddressInformation = ({ formData, setFormData, error }) => {
         municipality_name: data.municipality_name,
         province_name: data.province_name,
         region_name: data.region_name,
+        barangay_center_id: data.barangay_center_id ?? '',
+        barangay_health_station: data.barangay_health_station ?? '',
       }));
     }
   };
