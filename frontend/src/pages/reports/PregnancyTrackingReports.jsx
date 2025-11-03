@@ -260,6 +260,12 @@ const PregnancyTrackingReports = () => {
       );
       addWorksheet(workbook, 'Completed', completedData, 'Completed');
 
+      // 5. By Completed
+      const hasPhic = allData.filter(
+        (item) => item.phic === true || item.phic === 1
+      );
+      addWorksheet(workbook, 'Has PhilHealth', hasPhic, 'Has PhilHealth');
+
       // 6. By Referral (empty pregnancy status)
       const referralData = allData.filter(
         (item) =>
@@ -302,6 +308,7 @@ const PregnancyTrackingReports = () => {
         ['Second Trimester', secondTrimesterData.length],
         ['Third Trimester', thirdTrimesterData.length],
         ['Completed', completedData.length],
+        ['Has Philhealth', hasPhic.length],
         ['Referral', referralData.length],
         [''],
         ['By Health Station:'],

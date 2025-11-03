@@ -9,9 +9,12 @@ import OutPatientsForm from '../../components/forms/outpatients/OutPatientsForm'
 import {
   outPatientEditFormData,
   outPatientFormData,
+  prenatal_outpatient_immunization_edit_form_data,
+  prenatal_outpatient_immunization_form_data,
 } from '../../utils/formDefault';
 import OutPatientPDF from '../../components/interfaces/pdf/OutPatientPDF';
 import { pdf } from '@react-pdf/renderer';
+import UnifiedForm from '../../components/forms/unified_form/UnifiedForm.jsx';
 const OutPatients = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -36,7 +39,8 @@ const OutPatients = () => {
     setIsEdit(true);
 
     setOutPatientId(row.id);
-    setFormData(outPatientEditFormData(row));
+    setFormData(prenatal_outpatient_immunization_edit_form_data(row));
+    // setFormData(outPatientEditFormData(row));
 
     setIsOpen(true);
   };
@@ -46,16 +50,77 @@ const OutPatients = () => {
     setIsOpen(true);
   };
 
-  const onSubmit = (e) => {
+  // const onSubmit = (e) => {
+  //   handleSubmit({
+  //     e,
+  //     isEdit,
+  //     url: isEdit ? `/api/out-patients/${outPatientId}` : '/api/out-patients',
+  //     formData,
+  //     onSuccess: () => dataTableRef.current?.fetchData(),
+  //     onReset: () => {
+  //       setFormData(outPatientFormData);
+  //       setError({});
+  //       setIsOpen(false);
+  //       if (isEdit) {
+  //         setOutPatientId(0);
+  //         setIsEdit(false);
+  //       }
+  //     },
+  //   });
+  // };
+
+  const onSubmit = (e, showImmunization, setShowImmunization) => {
+    e.preventDefault();
+
+    // Prepare the data to send
+    let dataToSend = { ...formData };
+
+    // // If patient is NOT in third trimester, remove all immunization fields
+    if (!showImmunization) {
+      const {
+        tetanus_first_given,
+        tetanus_second_given,
+        tetanus_third_given,
+        tetanus_fourth_given,
+        tetanus_fifth_given,
+        tetanus_first_comeback,
+        tetanus_second_comeback,
+        tetanus_third_comeback,
+        tetanus_fourth_comeback,
+        tetanus_fifth_comeback,
+        covid_first_given,
+        covid_second_given,
+        covid_booster_given,
+        covid_first_comeback,
+        covid_second_comeback,
+        covid_booster_comeback,
+        other_vaccine_name,
+        other_first_given,
+        other_second_given,
+        other_third_given,
+        other_fourth_given,
+        other_fifth_given,
+        other_first_comeback,
+        other_second_comeback,
+        other_third_comeback,
+        other_fourth_comeback,
+        other_fifth_comeback,
+        ...prenatalDataOnly
+      } = dataToSend;
+
+      dataToSend = prenatalDataOnly;
+    }
+
     handleSubmit({
       e,
       isEdit,
-      url: isEdit ? `/api/out-patients/${outPatientId}` : '/api/out-patients',
-      formData,
+      url: `/api/unified-form/update/${outPatientId}`,
+      formData: dataToSend,
       onSuccess: () => dataTableRef.current?.fetchData(),
       onReset: () => {
-        setFormData(outPatientFormData);
+        setFormData(prenatal_outpatient_immunization_form_data);
         setError({});
+        setShowImmunization(false);
         setIsOpen(false);
         if (isEdit) {
           setOutPatientId(0);
@@ -75,9 +140,7 @@ const OutPatients = () => {
 
   const handelDownload = async (row) => {
     try {
-      const blob = await pdf(
-        <OutPatientPDF formData={row} />
-      ).toBlob();
+      const blob = await pdf(<OutPatientPDF formData={row} />).toBlob();
 
       // Create a proper blob with correct MIME type
       const pdfBlob = new Blob([blob], { type: 'application/pdf' });
@@ -127,8 +190,8 @@ const OutPatients = () => {
         showPerPage={true}
         showActions={true}
         defaultPerPage={10}
-        onAdd={handleAdd}
-        addButton={user.role_id !== 2 ? 'Add Out Patient' : ''}
+        // onAdd={handleAdd}
+        // addButton={user.role_id !== 2 ? 'Add Out Patient' : ''}
         ref={dataTableRef}
       />
       {isOpen && (
@@ -138,11 +201,20 @@ const OutPatients = () => {
           title={'Out Patient'}
           className={'sm:max-w-6xl'}
         >
-          <OutPatientsForm
+          {/* <OutPatientsForm
             onSubmit={onSubmit}
             inputChange={inputChange}
             formData={formData}
             setFormData={setFormData}
+            error={error}
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+          /> */}
+
+          <UnifiedForm
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={onSubmit}
             error={error}
             isSubmitting={isSubmitting}
             isEdit={isEdit}

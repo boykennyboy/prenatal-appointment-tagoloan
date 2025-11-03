@@ -15,6 +15,7 @@ use App\Models\BarangayWorker;
 use App\Models\Midwife;
 use App\Models\Municipality;
 use App\Models\Nurse;
+use App\Models\Patient;
 use App\Models\PregnancyTracking;
 use App\Models\Province;
 use App\Models\Region;
@@ -81,12 +82,21 @@ class SelectAddressController extends Controller
         $province = Province::find($request->input('province_id'));
         $region = Region::find($request->input('region_id'));
 
+        $barangay_center = BarangayCenter::select('id', 'health_station', 'region', 'province', 'municipality', 'barangay')
+            ->where('region', $region->id)
+            ->where('province', $province->id)
+            ->where('municipality', $municipality->id)
+            ->where('barangay', $barangay->id)
+            ->first();
+
         // Bundle the names into a simple object or array
         $address = (object) [
             'barangay_name' => $barangay?->name,
             'municipality_name' => $municipality?->name,
             'province_name' => $province?->name,
             'region_name' => $region?->name,
+            'barangay_center_id' => $barangay_center?->id,
+            'barangay_health_station' => $barangay_center?->health_station,
         ];
 
         return new GetAddressesNameResource($address);
@@ -122,6 +132,10 @@ class SelectAddressController extends Controller
     {
         $pregnancy_trackings = PregnancyTracking::select(['id', 'fullname'])
             ->where('isDone', false)
+            ->where('pregnancy_status', '!=', 'completed')
+            ->where('pregnancy_status', '!=', 'discontinued')
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
+            ->whereHas('risk_codes')
             ->get();
 
         return $pregnancy_trackings->map(function ($tracking) {
@@ -132,7 +146,7 @@ class SelectAddressController extends Controller
         });
     }
 
-    public function pregnancy_trackings_has_appointments()
+    public function pregnancy_trackings_has_appointments(Request $request)
     {
         // $pregnancy_trackings = PregnancyTracking::select(['id', 'fullname'])
         //     ->where('isDone', false)
@@ -146,8 +160,12 @@ class SelectAddressController extends Controller
         //     ];
         // });
 
+        $isEdit = $request->get('isEdit');
+
         $appointment = Appointment::with('pregnancy_tracking')
-            ->whereDate('appointment_date', Carbon::today())
+            ->when(!$isEdit, function ($query) {
+                $query->whereDate('appointment_date', Carbon::today());
+            })
             ->get();
 
         return $appointment->map(function ($apt) {
@@ -240,6 +258,48 @@ class SelectAddressController extends Controller
 
         return [
             'data' => $has_midwife && $has_nurse,
+        ];
+    }
+
+    public function visit_count(Request $request)
+    {
+        $pregnancy_id = $request->get('pregnancy_id');
+
+        $appointment_count = Appointment::where('pregnancy_tracking_id', $pregnancy_id)
+            ->where('status', 'completed')
+            ->count();
+
+        return $appointment_count;
+    }
+
+    public function existing_patient(Request $request)
+    {
+        $patient_id = $request->get('patient_id');
+
+        $patient = Patient::select('id', 'birth_date', 'region', 'province', 'municipality', 'barangay')
+            ->where('id', $patient_id)
+            ->first();
+
+        $pregnancy_trackings = PregnancyTracking::select('id', 'patient_id', 'gravidity', 'parity', 'abortion', 'pregnancy_status')
+            ->where('patient_id', $patient_id)
+            ->latest()
+            ->first();
+
+        $barangay_center = BarangayCenter::select('id', 'health_station', 'region', 'province', 'municipality', 'barangay')
+            ->where('region', $patient->region)
+            ->where('province', $patient->province)
+            ->where('municipality', $patient->municipality)
+            ->where('barangay', $patient->barangay)
+            ->first();
+
+        if ($pregnancy_trackings) {
+            $pregnancy_trackings->birth_date = $patient->birth_date ?? null;
+            $pregnancy_trackings->barangay_center_id = $barangay_center->id ?? null;
+            $pregnancy_trackings->barangay_health_station = $barangay_center->health_station ?? null;
+        }
+
+        return [
+            'data' => $pregnancy_trackings
         ];
     }
 }

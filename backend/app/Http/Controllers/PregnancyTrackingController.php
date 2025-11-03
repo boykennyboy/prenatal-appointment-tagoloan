@@ -59,6 +59,9 @@ class PregnancyTrackingController extends Controller
             ->when($user->role_id === 2, function ($query) use ($user) {
                 $query->where('pregnancy_trackings.barangay_center_id', $user->barangay_center_id);
             })
+            ->when($user->role_id !== 2, function ($query) use ($user) {
+                $query->whereHas('risk_codes');
+            })
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('pregnancy_trackings.fullname', 'LIKE', "%{$search}%")
@@ -156,10 +159,17 @@ class PregnancyTrackingController extends Controller
 
                 $fields['fullname'] = $patient->fullname;
                 $fields['barangay_health_station'] = $health_station?->health_station;
+            } else {
+                $patient = Patient::findOrFail($fields['patient_id']);
+
+                $fields['fullname'] = $patient->fullname;
+
+                $health_station = BarangayCenter::find($fields['barangay_center_id']);
+
+                $fields['barangay_health_station'] = $health_station?->health_station;
             }
 
             $pregnancy_tracking = PregnancyTracking::create($fields);
-
             // Generate unique number after creation
             $dailyCount = PregnancyTracking::whereDate('created_at', now())->count();
             $pregnancy_tracking_number = now()->format('Y')
@@ -201,6 +211,8 @@ class PregnancyTrackingController extends Controller
                     ]);
                 }
             }
+
+            $pregnancy_tracking->load(['risk_codes', 'appointments', 'doctor']);
 
             return $pregnancy_tracking;
         });
@@ -328,21 +340,94 @@ class PregnancyTrackingController extends Controller
 
     public function update_pregnancy(Request $request, PregnancyTracking $pregnancy_tracking)
     {
+        $outcome_type = $request->get('outcome_type');
+
+        // 🩹 Handle miscarriage case
+        if ($outcome_type === 'miscarriage') {
+
+            // Check if LMP is more than 20 weeks ago
+            $lmp = Carbon::parse($pregnancy_tracking->lmp);
+            $weeksSinceLmp = $lmp->diffInWeeks(Carbon::now());
+
+            if ($weeksSinceLmp > 20) {
+
+                $pregnancy_tracking->update([
+                    'isDone' => true,
+                    'parity' => (int) $pregnancy_tracking->abortion + 1,
+                    'pregnancy_status' => 'miscarriage_abortion',
+                ]);
+
+                return [
+                    'message' => 'Miscarriage/Abortion is happens more than 20 weeks. Parity is updated!',
+                ];
+            }
+
+            $pregnancy_tracking->update([
+                'isDone' => true,
+                'abortion' => (int) $pregnancy_tracking->abortion + 1,
+                'pregnancy_status' => 'miscarriage_abortion',
+            ]);
+
+            return [
+                'message' => 'Miscarriage/Abortion is happens less than 20 weeks. Abortion is updated!',
+            ];
+        }
+
+        // ✅ Validate when not miscarriage
         $fields = $request->validate([
             'outcome_sex' => 'required',
             'outcome_weight' => 'required',
             'place_of_delivery' => 'required|string|max:255',
-            'date_delivery' => 'required|date|max:255',
+            'date_delivery' => 'required|date',
             'phic' => 'required',
         ]);
 
         DB::transaction(function () use ($request, $pregnancy_tracking, $fields) {
-            $oldPregnancyData = $pregnancy_tracking->only(['pregnancy_tracking_number', 'patient_id', 'fullname', 'age', 'pregnancy_status', 'anc_given']);
+            $oldPregnancyData = $pregnancy_tracking->only([
+                'pregnancy_tracking_number',
+                'patient_id',
+                'fullname',
+                'age',
+                'pregnancy_status',
+                'anc_given'
+            ]);
+
+            $lmp = Carbon::parse($pregnancy_tracking->lmp);
+            $weeksSinceLmp = $lmp->diffInWeeks(Carbon::now());
+
+            $isMiscarriageBefore = $pregnancy_tracking->pregnancy_status === 'miscarriage_abortion';
+
+            // Default values
+            $updatedParity = is_numeric($pregnancy_tracking->parity)
+                ? (int) $pregnancy_tracking->parity
+                : 0;
+
+            $updatedAbortion = is_numeric($pregnancy_tracking->abortion)
+                ? (int) $pregnancy_tracking->abortion
+                : 0;
+
+            // 🔹 Logic handling
+            if ($weeksSinceLmp > 20) {
+                if ($isMiscarriageBefore) {
+                    // Miscarriage but beyond 20 weeks → subtract from parity
+                    $updatedParity = max(0, $updatedParity);
+                } else {
+                    // Normal delivery beyond 20 weeks → add to parity
+                    $updatedParity += 1;
+                }
+            } else {
+                // Pregnancy less than or equal to 20 weeks → count as abortion
+                $updatedAbortion = max(0, $updatedAbortion - 1);
+            }
+
+
 
             $pregnancy_tracking->update(array_merge($fields, [
-                "isDone" => true,
+                'isDone' => true,
                 'pregnancy_status' => 'completed',
                 'anc_given' => 1,
+                'abortion' => $updatedAbortion,
+                'parity' => $updatedParity,
             ]));
 
             ActivityLogs::create([
@@ -351,20 +436,27 @@ class PregnancyTrackingController extends Controller
                 'title' => 'Complete Pregnancy Tracking Updated',
                 'info' => [
                     'old' => $oldPregnancyData,
-                    'new' => $pregnancy_tracking->only(['pregnancy_tracking_number', 'patient_id', 'fullname', 'age', 'pregnancy_status', 'anc_given']),
+                    'new' => $pregnancy_tracking->only([
+                        'pregnancy_tracking_number',
+                        'patient_id',
+                        'fullname',
+                        'age',
+                        'pregnancy_status',
+                        'anc_given'
+                    ]),
                 ],
                 'loggable_type' => PregnancyTracking::class,
                 'loggable_id' => $pregnancy_tracking->id,
-                'ip_address' => $request->ip() ?? null,
-                'user_agent' => $request->header('User-Agent') ?? null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
             ]);
         });
 
-
         return [
-            'message' => 'Pregnancy Tracking updated successfully',
+            'message' => 'Pregnancy tracking updated successfully.',
         ];
     }
+
 
     /**
      * Remove the specified resource from storage.

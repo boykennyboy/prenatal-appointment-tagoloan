@@ -19,6 +19,8 @@ class GetAddressesNameResource extends JsonResource
             'municipality_name' => $this->municipality_name,
             'province_name' => $this->province_name,
             'region_name' => $this->region_name,
+            'barangay_center_id' => $this->barangay_center_id,
+            'barangay_health_station' => $this->barangay_health_station,
         ];
     }
 }

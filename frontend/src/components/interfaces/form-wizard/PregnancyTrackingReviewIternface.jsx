@@ -115,31 +115,55 @@ const PregnancyReviewInterface = ({
     return parts.join(' ') || 'Not specified';
   };
 
-  const handlePrintPDF = async () => {
+  const handlePrintPDF = async (row) => {
     if (!pregnancyTrackingData) return toast.error('No data to print');
 
-    const blob = await pdf(
-      <PregnancyTrackingPDF
-        formData={pregnancyTrackingData}
-        patientType={patientType}
-      />
-    ).toBlob();
+    try {
+      const blob = await pdf(
+        <PregnancyTrackingPDF
+          formData={pregnancyTrackingData}
+          patientType={patientType}
+        />
+      ).toBlob();
 
-    const url = URL.createObjectURL(blob);
+      // Create a proper blob with correct MIME type
+      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const url = URL.createObjectURL(pdfBlob);
 
-    // ✅ Trigger browser download
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'pregnancy-tracking.pdf'; // filename
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      // Open in new tab
+      window.open(url, '_blank');
 
-    // optional: also open in new tab for preview
-    window.open(url, '_blank');
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // Don't revoke - let it persist
+    } catch (error) {
+      console.error('PDF generation failed:', error);
+    }
   };
+
+  // const handlePrintPDF = async () => {
+  //   if (!pregnancyTrackingData) return toast.error('No data to print');
+
+  //   const blob = await pdf(
+  //     <PregnancyTrackingPDF
+  //       formData={pregnancyTrackingData}
+  //       patientType={patientType}
+  //     />
+  //   ).toBlob();
+
+  //   const url = URL.createObjectURL(blob);
+
+  //   // ✅ Trigger browser download
+  //   const link = document.createElement('a');
+  //   link.href = url;
+  //   link.download = 'pregnancy-tracking.pdf'; // filename
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+
+  //   // optional: also open in new tab for preview
+  //   window.open(url, '_blank');
+
+  //   setTimeout(() => URL.revokeObjectURL(url), 1000);
+  // };
 
   return (
     <div className='space-y-6'>
@@ -242,6 +266,33 @@ const PregnancyReviewInterface = ({
             <InfoRow label='HRH In-chrage' value={savedData.nurse_name} />
             <InfoRow label='Midwife' value={savedData.midwife_name} />
           </div>
+        </InfoCard>
+
+        {/* Risk Codes */}
+        <InfoCard title='Risk Codes' icon={FileText} className='lg:col-span-2'>
+          {savedData.risk_codes && savedData.risk_codes.length > 0 ? (
+            <div className='space-y-4'>
+              {savedData.risk_codes.map((risk, index) => (
+                <div
+                  key={index}
+                  className='border-b border-gray-100 last:border-b-0 pb-3 last:pb-0'
+                >
+                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                    <InfoRow label='Risk Code' value={risk.risk_code} />
+                    <InfoRow
+                      label='Date Detected'
+                      value={formatDate(risk.date_detected)}
+                    />
+                    <InfoRow label='Status' value={risk.risk_status} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className='text-sm text-gray-500 italic'>
+              No risk codes recorded
+            </p>
+          )}
         </InfoCard>
       </div>
 

@@ -28,33 +28,44 @@ const Dashboard = () => {
 
     switch (status.toLowerCase()) {
       case 'completed':
-        d_status = 'Completed';
         classes = 'bg-green-100 text-green-800';
+        d_status = 'Completed';
         break;
       case 'first_trimester':
-        d_status = '1st Trimester';
         classes = 'bg-blue-100 text-blue-800';
+        d_status = '1st Trimester';
         break;
       case 'second_trimester':
+        classes = 'bg-cyan-100 text-cyan-800';
         d_status = '2nd Trimester';
-        classes = 'bg-teal-100 text-teal-800';
         break;
       case 'third_trimester':
+        classes = 'bg-indigo-100 text-indigo-800';
         d_status = '3rd Trimester';
-        classes = 'bg-purple-100 text-purple-800';
         break;
       case 'accepted':
+        classes = 'bg-emerald-100 text-emerald-800';
         d_status = 'Accepted';
-        classes = 'bg-green-100 text-green-800';
         break;
       case 'pending':
+        classes = 'bg-amber-100 text-amber-800';
         d_status = 'Pending';
-        classes = 'bg-yellow-100 text-yellow-800';
+        break;
+      case 'miscarriage_abortion':
+        classes = 'bg-rose-100 text-rose-800';
+        d_status = 'Miscarriage/Abortion';
+        break;
+      case 'discontinued':
+        classes = 'bg-orange-100 text-orange-800';
+        d_status = 'Discontinued';
+        break;
+      case 'normal':
+        classes = 'bg-lime-100 text-lime-800';
+        d_status = 'Normal';
         break;
       default:
-        d_status = 'Referral';
-        classes = 'bg-gray-100 text-gray-800';
-        break;
+        classes = 'bg-gray-200 text-gray-800';
+        d_status = 'Unknown';
     }
 
     return { d_status, classes };
@@ -150,7 +161,7 @@ const Dashboard = () => {
             />
             <Card
               title='Prenatal Visit Records'
-              value={data?.total_prenatal_visit || 'Loading ...'}
+              value={data?.total_prenatal_visit || 0}
               icon={ClipboardList}
               iconBgColor='bg-blue-100'
               iconColor='text-blue-600'
