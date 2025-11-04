@@ -260,6 +260,30 @@ const PregnancyTrackingReports = () => {
       );
       addWorksheet(workbook, 'Completed', completedData, 'Completed');
 
+      const abortionData = allData.filter(
+        (item) =>
+          item.pregnancy_status?.toLowerCase() === 'miscarriage_abortion' ||
+          item.status?.toLowerCase() === 'miscarriage_abortion'
+      );
+      addWorksheet(
+        workbook,
+        'Miscarriage or Abortion',
+        abortionData,
+        'Miscarriage or Abortion'
+      );
+
+      const discontinuedData = allData.filter(
+        (item) =>
+          item.pregnancy_status?.toLowerCase() === 'discontinued' ||
+          item.status?.toLowerCase() === 'discontinued'
+      );
+      addWorksheet(workbook, 'Discontinued', discontinuedData, 'Discontinued');
+
+      const hasPhic = allData.filter(
+        (item) => item.phic === true || item.phic === 1
+      );
+      addWorksheet(workbook, 'Has PhilHealth', hasPhic, 'Has PhilHealth');
+
       // 6. By Referral (empty pregnancy status)
       const referralData = allData.filter(
         (item) =>
@@ -292,6 +316,53 @@ const PregnancyTrackingReports = () => {
         );
       });
 
+      // NEW: Group by Month based on created_at
+      const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+
+      // Group createdAt by month-year
+      const createAt = {};
+
+      allData.forEach((item) => {
+        if (item.created_at) {
+          const date = new Date(item.created_at);
+          const monthYear = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, '0')}`;
+          const monthLabel = `${
+            monthNames[date.getMonth()]
+          } ${date.getFullYear()}`;
+
+          if (!createAt[monthYear]) {
+            createAt[monthYear] = {
+              label: monthLabel,
+              data: [],
+            };
+          }
+          createAt[monthYear].data.push(item);
+        }
+      });
+
+      // Sort months chronologically and add worksheets
+      const sortedMonths = Object.keys(createAt).sort();
+
+      sortedMonths.forEach((monthYear) => {
+        const { label, data } = createAt[monthYear];
+        addWorksheet(workbook, label, data, label);
+      });
+
       // 8. Summary Sheet
       const summaryWorksheet = workbook.addWorksheet('Summary');
 
@@ -302,12 +373,21 @@ const PregnancyTrackingReports = () => {
         ['Second Trimester', secondTrimesterData.length],
         ['Third Trimester', thirdTrimesterData.length],
         ['Completed', completedData.length],
+        ['Miscarriage or Abortion', abortionData.length],
+        ['Discontinued', discontinuedData.length],
+        ['Has Philhealth', hasPhic.length],
         ['Referral', referralData.length],
         [''],
         ['By Health Station:'],
         ...Object.keys(healthStationData).map((station) => [
           station,
           healthStationData[station].length,
+        ]),
+        [''],
+        ['Created By Month:', ''],
+        ...sortedMonths.map((monthYear) => [
+          createAt[monthYear].label,
+          createAt[monthYear].data.length,
         ]),
         [''],
         ['Report Generated:', new Date().toLocaleString()],

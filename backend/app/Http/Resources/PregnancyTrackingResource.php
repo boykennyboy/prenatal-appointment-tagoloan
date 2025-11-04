@@ -18,6 +18,11 @@ class PregnancyTrackingResource extends JsonResource
 
         // Check if patient has an appointment
         $hasAppointment = $this->appointments()->exists();
+        $high_risk = $this->risk_codes()->exists();
+
+        $pregnancy_status = ($user && $user->id === 2)
+            ? (!$high_risk ? 'normal' : ($hasAppointment ? 'accepted' : 'pending'))
+            : $this->pregnancy_status;
 
         return [
             'id' => $this->id,
@@ -61,9 +66,7 @@ class PregnancyTrackingResource extends JsonResource
             'abortion' => $this->abortion,
             'lmp' => $this->lmp,
             'edc' => $this->edc,
-            'pregnancy_status' => $user && $user->id === 2
-                ? ($hasAppointment ? 'accepted' : 'pending')
-                : $this->pregnancy_status,
+            'pregnancy_status' => $pregnancy_status,
             'bemoc' => $this->bemoc,
             'bemoc_address' => $this->bemoc_address,
             'cemoc' => $this->cemoc,

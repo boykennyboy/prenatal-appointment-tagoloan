@@ -192,11 +192,15 @@ class OutPatientController extends Controller
             ->latest('created_at')
             ->first();
 
+        $pregnancyTracking = PregnancyTracking::where('id', $id)
+            ->where('isDone', false)
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
+            ->where('pregnancy_status', '!=', 'discontinued')
+            ->first();
+
         if ($out_patient) {
             return ['data' => new PrenatalOutPatientValueResource($out_patient)];
         }
-
-        $pregnancyTracking = PregnancyTracking::where('id', $id)->where('isDone', false)->first();
 
         $referenceDate = Carbon::now();
         $lmp = $pregnancyTracking->lmp ? Carbon::parse($pregnancyTracking->lmp) : null;
@@ -217,6 +221,7 @@ class OutPatientController extends Controller
                 'pr'      => '',
                 'two_sat' => '',
                 'bp'      => '',
+                'pregnancy_status' => $pregnancyTracking->pregnancy_status,
                 'aog'     => $aog,
             ]
         ];

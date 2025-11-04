@@ -164,6 +164,16 @@ const today = new Date().toLocaleDateString('en-US', {
   day: '2-digit',
   year: 'numeric',
 });
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-CA', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+};
 // PDF Document Component
 const OutPatientPDF = ({ formData = {} }) => (
   <Document>
@@ -225,7 +235,9 @@ const OutPatientPDF = ({ formData = {} }) => (
           </View>
           <Text style={[styles.label, { width: 60 }]}>BIRTHDATE</Text>
           <View style={[styles.underline, styles.shortUnderline]}>
-            <Text style={styles.dataText}>{formData.birth_date || ''}</Text>
+            <Text style={styles.dataText}>
+              {formatDate(formData.birth_date) || ''}
+            </Text>
           </View>
           <Text style={[styles.label, { width: 50 }]}>RELIGION</Text>
           <View style={[styles.underline, styles.shortUnderline]}>
@@ -294,7 +306,9 @@ const OutPatientPDF = ({ formData = {} }) => (
           <Text style={[styles.tableHeader, styles.lastCell]}>BP</Text>
         </View>
         <View style={styles.tableRow}>
-          <Text style={styles.tableCell}>{formData.date || ''}</Text>
+          <Text style={styles.tableCell}>
+            {formatDate(formData.date) || ''}
+          </Text>
           <Text style={styles.tableCell}>{formData.time || ''}</Text>
           <Text style={styles.tableCell}>{formData.weight || ''}</Text>
           <Text style={styles.tableCell}>{formData.height || ''}</Text>
@@ -313,10 +327,10 @@ const OutPatientPDF = ({ formData = {} }) => (
         <Text style={styles.commentsTitle}>Comments</Text>
       </View>
       {/* Footer */}
-        <View style={styles.footer}>
-          <Text>Online Prenatal Appointment System</Text>
-          <Text>{today}</Text>
-        </View>
+      <View style={styles.footer}>
+        <Text>Online Prenatal Appointment System</Text>
+        <Text>{today}</Text>
+      </View>
     </Page>
   </Document>
 );

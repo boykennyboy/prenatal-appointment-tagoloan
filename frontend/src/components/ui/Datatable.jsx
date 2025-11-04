@@ -108,6 +108,16 @@ const DataTable = forwardRef((props, ref) => {
       name: '3rd Trimester',
       value: 'third_trimester',
     },
+    {
+      show: ['Pregnancy Tracking'],
+      name: 'Miscarriage/Abortion',
+      value: 'miscarriage_abortion',
+    },
+    {
+      show: ['Pregnancy Tracking'],
+      name: 'Discontinued',
+      value: 'discontinued',
+    },
   ];
 
   const pregnancyStatusOptions = [
@@ -126,6 +136,14 @@ const DataTable = forwardRef((props, ref) => {
     {
       name: 'Completed',
       value: 'completed',
+    },
+    {
+      name: 'Miscarriage/Abortion',
+      value: 'miscarriage_abortion',
+    },
+    {
+      name: 'Discontinued',
+      value: 'discontinued',
     },
   ];
 

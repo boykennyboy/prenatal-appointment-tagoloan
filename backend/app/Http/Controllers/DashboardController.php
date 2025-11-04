@@ -23,6 +23,9 @@ class DashboardController extends Controller
         $baseQuery = PregnancyTracking::query()
             ->when($user && $user->role_id === 2, function ($query) use ($user) {
                 $query->where('pregnancy_trackings.barangay_center_id', $user->barangay_center_id);
+            })
+            ->when($user->role_id !== 2, function ($query) use ($user) {
+                $query->whereHas('risk_codes');
             });
 
         // Get accurate counts using separate queries to avoid JOIN multiplication
@@ -45,6 +48,9 @@ class DashboardController extends Controller
         $pregnancy = PregnancyTracking::with(['patient', 'barangay_center'])
             ->when($user && $user->role_id === 2, function ($query) use ($user) {
                 $query->where('barangay_center_id', $user->barangay_center_id);
+            })
+            ->when($user->role_id !== 2, function ($query) use ($user) {
+                $query->whereHas('risk_codes');
             })
             ->limit(8)
             ->orderBy('created_at', 'desc')

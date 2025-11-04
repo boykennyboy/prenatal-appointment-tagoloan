@@ -165,6 +165,16 @@ const today = new Date().toLocaleDateString('en-US', {
   day: '2-digit',
   year: 'numeric',
 });
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-CA', {
+    month: 'short',
+    day: '2-digit',
+    year: 'numeric',
+  });
+};
 // PDF Document Component
 const ImmunizationPDF = ({ formData = {} }) => (
   <Document>
@@ -203,37 +213,47 @@ const ImmunizationPDF = ({ formData = {} }) => (
         {/* Tetanus Doses */}
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>1st DOSE</Text>
-          <Text style={styles.dataCell}>{formData.tetanus_first_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.tetanus_first_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.tetanus_first_comeback}
+            {formatDate(formData.tetanus_first_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>2nd DOSE</Text>
-          <Text style={styles.dataCell}>{formData.tetanus_second_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.tetanus_second_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.tetanus_second_comeback}
+            {formatDate(formData.tetanus_second_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>3rd DOSE</Text>
-          <Text style={styles.dataCell}>{formData.tetanus_third_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.tetanus_third_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.tetanus_third_comeback}
+            {formatDate(formData.tetanus_third_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>4th DOSE</Text>
-          <Text style={styles.dataCell}>{formData.tetanus_fourth_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.tetanus_fourth_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.tetanus_fourth_comeback}
+            {formatDate(formData.tetanus_fourth_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>5th DOSE</Text>
-          <Text style={styles.dataCell}>{formData.tetanus_fifth_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.tetanus_fifth_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.tetanus_fifth_comeback}
+            {formatDate(formData.tetanus_fifth_comeback)}
           </Text>
         </View>
 
@@ -258,23 +278,29 @@ const ImmunizationPDF = ({ formData = {} }) => (
         {/* COVID Doses */}
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>1st DOSE</Text>
-          <Text style={styles.dataCell}>{formData.covid_first_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.covid_first_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.covid_first_comeback}
+            {formatDate(formData.covid_first_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>2nd DOSE</Text>
-          <Text style={styles.dataCell}>{formData.covid_second_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.covid_second_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.covid_second_comeback}
+            {formatDate(formData.covid_second_comeback)}
           </Text>
         </View>
         <View style={styles.tableRow}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>BOOSTER</Text>
-          <Text style={styles.dataCell}>{formData.covid_booster_given}</Text>
+          <Text style={styles.dataCell}>
+            {formatDate(formData.covid_booster_given)}
+          </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.covid_booster_comeback}
+            {formatDate(formData.covid_booster_comeback)}
           </Text>
         </View>
 
@@ -308,27 +334,27 @@ const ImmunizationPDF = ({ formData = {} }) => (
             </View>
           </View>
           <Text style={styles.dataCell}>
-            {formData.other_first_given || ''}
+            {formatDate(formData.other_first_given) || ''}
           </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.other_first_comeback || ''}
+            {formatDate(formData.other_first_comeback) || ''}
           </Text>
         </View>
         <View style={[styles.tableRow, styles.lastRow]}>
           <Text style={[styles.vaccineNameCell, styles.doseRow]}>2.</Text>
           <Text style={styles.dataCell}>
-            {formData.other_second_given || ''}
+            {formatDate(formData.other_second_given) || ''}
           </Text>
           <Text style={[styles.dataCell, styles.lastCell]}>
-            {formData.other_second_comeback || ''}
+            {formatDate(formData.other_second_comeback) || ''}
           </Text>
         </View>
       </View>
       {/* Footer */}
-        <View style={styles.footer}>
-          <Text>Online Prenatal Appointment System</Text>
-          <Text>{today}</Text>
-        </View>
+      <View style={styles.footer}>
+        <Text>Online Prenatal Appointment System</Text>
+        <Text>{today}</Text>
+      </View>
     </Page>
   </Document>
 );

@@ -8,7 +8,7 @@ const ContactPersonInfo = ({ formData, inputChange, error }) => {
     { name: 'Father', value: 'father' },
     { name: 'Mother', value: 'mother' },
     { name: 'Sibling', value: 'sibling' },
-    { name: 'Gurdian', value: 'gurdian' },
+    { name: 'Guardian', value: 'guardian' },
   ];
 
   return (

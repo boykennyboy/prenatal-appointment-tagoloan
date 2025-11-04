@@ -1,3 +1,4 @@
+
 import * as XLSX from 'exceljs';
 import api from '../../api/axios';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -150,6 +151,53 @@ const OutPatientReports = () => {
         );
       });
 
+      // NEW: Group by Month based on created_at
+      const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+
+      // Group createdAt by month-year
+      const createAt = {};
+
+      allData.forEach((item) => {
+        if (item.created_at) {
+          const date = new Date(item.created_at);
+          const monthYear = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, '0')}`;
+          const monthLabel = `${
+            monthNames[date.getMonth()]
+          } ${date.getFullYear()}`;
+
+          if (!createAt[monthYear]) {
+            createAt[monthYear] = {
+              label: monthLabel,
+              data: [],
+            };
+          }
+          createAt[monthYear].data.push(item);
+        }
+      });
+
+      // Sort months chronologically and add worksheets
+      const sortedMonths = Object.keys(createAt).sort();
+
+      sortedMonths.forEach((monthYear) => {
+        const { label, data } = createAt[monthYear];
+        addWorksheet(workbook, label, data, label);
+      });
+
       // 3. Summary Sheet
       const summaryWorksheet = workbook.addWorksheet('Summary');
 
@@ -161,6 +209,12 @@ const OutPatientReports = () => {
         ...Object.keys(attendedBy).map((physician) => [
           physician,
           attendedBy[physician].length,
+        ]),
+        [''],
+        ['Created By Month:', ''],
+        ...sortedMonths.map((monthYear) => [
+          createAt[monthYear].label,
+          createAt[monthYear].data.length,
         ]),
         [''],
         ['Report Generated:', new Date().toLocaleString()],

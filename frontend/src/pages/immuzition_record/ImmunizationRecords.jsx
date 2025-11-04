@@ -51,9 +51,7 @@ const ImmunizationRecords = () => {
 
   const handelDownload = async (row) => {
     try {
-      const blob = await pdf(
-        <ImmunizationPDF formData={row} />
-      ).toBlob();
+      const blob = await pdf(<ImmunizationPDF formData={row} />).toBlob();
 
       // Create a proper blob with correct MIME type
       const pdfBlob = new Blob([blob], { type: 'application/pdf' });
@@ -138,8 +136,8 @@ const ImmunizationRecords = () => {
         showPerPage={true}
         showActions={true}
         defaultPerPage={10}
-        onAdd={handleAdd}
-        addButton={user.role_id !== 2 ? 'Add Immunization Record' : ''}
+        // onAdd={handleAdd}
+        // addButton={user.role_id !== 2 ? 'Add Immunization Record' : ''}
         ref={dataTableRef}
       />
       {isOpen && (

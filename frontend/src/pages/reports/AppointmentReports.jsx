@@ -166,6 +166,26 @@ const AppointmentReports = () => {
       );
       addWorksheet(workbook, 'Low priority', lowData, 'Low');
 
+      const priorityQueueData = allData.filter(
+        (item) => item.priority.toLowerCase() === 'priority_queue'
+      );
+      addWorksheet(
+        workbook,
+        'Priority Queue',
+        priorityQueueData,
+        'Priority Queue'
+      );
+
+      const regularQueueData = allData.filter(
+        (item) => item.priority.toLowerCase() === 'regular_queue'
+      );
+      addWorksheet(
+        workbook,
+        'Regular Queue',
+        regularQueueData,
+        'Regular Queue'
+      );
+
       // 2. By First Trimester
       const firstTrimesterData = allData.filter(
         (item) =>
@@ -213,6 +233,53 @@ const AppointmentReports = () => {
       );
       addWorksheet(workbook, 'Completed', completedData, 'Completed');
 
+      // NEW: Group by Month based on appointment_date
+      const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+
+      // Group appointments by month-year
+      const appointmentsByMonth = {};
+
+      allData.forEach((item) => {
+        if (item.appointment_date) {
+          const date = new Date(item.appointment_date);
+          const monthYear = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, '0')}`;
+          const monthLabel = `${
+            monthNames[date.getMonth()]
+          } ${date.getFullYear()}`;
+
+          if (!appointmentsByMonth[monthYear]) {
+            appointmentsByMonth[monthYear] = {
+              label: monthLabel,
+              data: [],
+            };
+          }
+          appointmentsByMonth[monthYear].data.push(item);
+        }
+      });
+
+      // Sort months chronologically and add worksheets
+      const sortedMonths = Object.keys(appointmentsByMonth).sort();
+
+      sortedMonths.forEach((monthYear) => {
+        const { label, data } = appointmentsByMonth[monthYear];
+        addWorksheet(workbook, label, data, label);
+      });
+
       // 6. Summary Sheet
       const summaryWorksheet = workbook.addWorksheet('Summary');
 
@@ -229,6 +296,14 @@ const AppointmentReports = () => {
         [''],
         ['High Priority', highData.length],
         ['Low Priority', lowData.length],
+        ['Priority Queue', priorityQueueData.length],
+        ['Regular Queue', regularQueueData.length],
+        [''],
+        ['Appointments By Month:', ''],
+        ...sortedMonths.map((monthYear) => [
+          appointmentsByMonth[monthYear].label,
+          appointmentsByMonth[monthYear].data.length,
+        ]),
         [''],
         ['Report Generated:', new Date().toLocaleString()],
       ];
@@ -238,7 +313,11 @@ const AppointmentReports = () => {
         const summaryRow = summaryWorksheet.addRow(row);
 
         // Style header rows
-        if (index === 7 || row[0] === 'Report Generated:') {
+        if (
+          index === 7 ||
+          row[0] === 'Report Generated:' ||
+          row[0] === 'By Month:'
+        ) {
           summaryRow.getCell(1).font = { bold: true };
         }
 
@@ -284,6 +363,7 @@ const AppointmentReports = () => {
       alert('Error generating Excel report. Please try again.');
     }
   };
+
   const Items = [
     { label: 'Dashboard', to: '/admin/dashboard' },
     { label: 'Reports', to: '/admin/reports' },

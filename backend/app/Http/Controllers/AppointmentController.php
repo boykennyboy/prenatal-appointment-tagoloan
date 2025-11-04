@@ -110,8 +110,6 @@ class AppointmentController extends Controller
                 ],
             ];
         }
-
-       
     }
 
     public function show(Appointment $qppointment) {}
@@ -124,7 +122,7 @@ class AppointmentController extends Controller
         $request->validate([
             'pregnancy_tracking_id' => 'required|exists:pregnancy_trackings,id',
             'appointment_date' => 'required|date|after:today',
-            'priority' => 'required|in:high,medium,low',
+            'priority' => 'required|in:high,medium,low,priority_queue,regular_queue',
             'visit_count' => 'integer|min:1',
             'doctor_id' => 'required',
             'notes' => 'nullable|string|max:1000'
@@ -195,7 +193,7 @@ class AppointmentController extends Controller
                     ['after_or_equal:today']
                 ),
             ],
-            'priority' => 'required|in:high,medium,low',
+            'priority' => 'required|in:high,medium,low,priority_queue,regular_queue',
             'visit_count' => 'integer|min:1',
             'notes' => 'nullable|string|max:1000',
         ]);

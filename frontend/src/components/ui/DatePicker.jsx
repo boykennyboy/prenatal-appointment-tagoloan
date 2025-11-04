@@ -29,7 +29,7 @@ const DatePicker = ({
     function handleClickOutside(e) {
       if (pickerRef.current && !pickerRef.current.contains(e.target)) {
         if (pickerRef.current.flatpickr) {
-          pickerRef.current.flatpickr.close();
+          pickerRef.current.flatpickr.close;
         }
       }
     }
@@ -97,7 +97,7 @@ const DatePicker = ({
   return (
     <div className='flex flex-col gap-2 mt-4 w-full'>
       {hasLabel && (
-        <label className='text-gray-700 text-sm font-medium' htmlFor={id}>
+        <label className='text-gray-700 font-medium' htmlFor={id}>
           {label}
         </label>
       )}
