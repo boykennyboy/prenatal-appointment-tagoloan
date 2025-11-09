@@ -238,6 +238,7 @@ const PrenatalVisits = () => {
             setFormData={setFormData}
             onSubmit={onSubmit}
             error={error}
+            setError={setError}
             isSubmitting={isSubmitting}
             isEdit={isEdit}
           />

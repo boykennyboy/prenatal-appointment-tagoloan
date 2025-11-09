@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import * as XLSX from 'exceljs';
 import Breadcrumb from '../../components/ui/Breadcrumb';
 import Container from '../../components/ui/Container';
@@ -6,6 +7,10 @@ import { pregnancy_tracking_columns } from '../../utils/columns';
 import api from '../../api/axios';
 
 const PregnancyTrackingReports = () => {
+  const [formDate, setFormDate] = useState({
+    start_date: '',
+    end_date: '',
+  });
   const columns = pregnancy_tracking_columns;
 
   const downloadReport = async () => {
@@ -15,6 +20,16 @@ const PregnancyTrackingReports = () => {
 
       const params = {
         report: true,
+        start_date: formDate.start_date
+          ? formDate.start_date.toLocaleDateString('en-CA')
+          : undefined,
+        end_date: formDate.end_date
+          ? (() => {
+              const end = new Date(formDate.end_date);
+              end.setHours(23, 59, 59, 999); // last millisecond of the day
+              return `${end.toLocaleDateString('en-CA')} 23:59:59`;
+            })()
+          : undefined,
       };
 
       // Fetch all pregnancy tracking data
@@ -260,7 +275,25 @@ const PregnancyTrackingReports = () => {
       );
       addWorksheet(workbook, 'Completed', completedData, 'Completed');
 
-      // 5. By Completed
+      const abortionData = allData.filter(
+        (item) =>
+          item.pregnancy_status?.toLowerCase() === 'miscarriage_abortion' ||
+          item.status?.toLowerCase() === 'miscarriage_abortion'
+      );
+      addWorksheet(
+        workbook,
+        'Miscarriage or Abortion',
+        abortionData,
+        'Miscarriage or Abortion'
+      );
+
+      const discontinuedData = allData.filter(
+        (item) =>
+          item.pregnancy_status?.toLowerCase() === 'discontinued' ||
+          item.status?.toLowerCase() === 'discontinued'
+      );
+      addWorksheet(workbook, 'Discontinued', discontinuedData, 'Discontinued');
+
       const hasPhic = allData.filter(
         (item) => item.phic === true || item.phic === 1
       );
@@ -298,6 +331,53 @@ const PregnancyTrackingReports = () => {
         );
       });
 
+      // NEW: Group by Month based on created_at
+      const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+
+      // Group createdAt by month-year
+      const createAt = {};
+
+      allData.forEach((item) => {
+        if (item.created_at) {
+          const date = new Date(item.created_at);
+          const monthYear = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, '0')}`;
+          const monthLabel = `${
+            monthNames[date.getMonth()]
+          } ${date.getFullYear()}`;
+
+          if (!createAt[monthYear]) {
+            createAt[monthYear] = {
+              label: monthLabel,
+              data: [],
+            };
+          }
+          createAt[monthYear].data.push(item);
+        }
+      });
+
+      // Sort months chronologically and add worksheets
+      const sortedMonths = Object.keys(createAt).sort();
+
+      sortedMonths.forEach((monthYear) => {
+        const { label, data } = createAt[monthYear];
+        addWorksheet(workbook, label, data, label);
+      });
+
       // 8. Summary Sheet
       const summaryWorksheet = workbook.addWorksheet('Summary');
 
@@ -308,6 +388,8 @@ const PregnancyTrackingReports = () => {
         ['Second Trimester', secondTrimesterData.length],
         ['Third Trimester', thirdTrimesterData.length],
         ['Completed', completedData.length],
+        ['Miscarriage or Abortion', abortionData.length],
+        ['Discontinued', discontinuedData.length],
         ['Has Philhealth', hasPhic.length],
         ['Referral', referralData.length],
         [''],
@@ -315,6 +397,12 @@ const PregnancyTrackingReports = () => {
         ...Object.keys(healthStationData).map((station) => [
           station,
           healthStationData[station].length,
+        ]),
+        [''],
+        ['Created By Month:', ''],
+        ...sortedMonths.map((monthYear) => [
+          createAt[monthYear].label,
+          createAt[monthYear].data.length,
         ]),
         [''],
         ['Report Generated:', new Date().toLocaleString()],
@@ -396,6 +484,7 @@ const PregnancyTrackingReports = () => {
         hasAdvanceFilter
         downloadReport={'Export Pregnancy Tracking'}
         onDownloadReport={downloadReport}
+        setFormDate={setFormDate}
       />
     </Container>
   );

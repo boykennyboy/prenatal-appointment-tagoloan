@@ -21,6 +21,7 @@ const PregnancyTrackingRecords = () => {
   const { user } = useAuthStore();
   const [searchParams] = useSearchParams();
   const pregnancyStatus = searchParams.get('pregnancy_status');
+  const [currentRow, setCurrentRow] = useState(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [pregnancyTrackingId, setPregnancyTrackingId] = useState(0);
@@ -50,20 +51,17 @@ const PregnancyTrackingRecords = () => {
   };
 
   const handleEdit = (row) => {
-    if (user.role_id !== 2) {
-      setPregnancyTrackingId(row.id);
-      setFormData((prev) => ({
-        ...prev,
-        date_delivery: row.date_delivery,
-        outcome_sex: row.outcome_sex,
-        outcome_weight: row.outcome_weight,
-        place_of_delivery: row.place_of_delivery,
-        phic: row.phic,
-      }));
-      setIsOpen(true);
-    } else {
-      navigate('create', { state: { row } });
-    }
+    setCurrentRow(row);
+    setPregnancyTrackingId(row.id);
+    setFormData((prev) => ({
+      ...prev,
+      date_delivery: row.date_delivery,
+      outcome_sex: row.outcome_sex,
+      outcome_weight: row.outcome_weight,
+      place_of_delivery: row.place_of_delivery,
+      phic: row.phic,
+    }));
+    setIsOpen(true);
   };
 
   const handleAdd = () => {
@@ -175,36 +173,100 @@ const PregnancyTrackingRecords = () => {
           {!outcomeType ? (
             // Outcome Selection Screen
             <div className='space-y-4 p-4'>
-              <h3 className='text-lg font-semibold text-gray-800 text-center mb-6'>
-                Select Pregnancy Outcome
-              </h3>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <button
-                  onClick={() => handleOutcomeSelection('successful')}
-                  className='flex flex-col items-center justify-center p-6 border-2 border-green-300 rounded-lg hover:bg-green-50 hover:border-green-500 transition-all duration-200 group'
-                >
-                  <CheckCircle className='h-12 w-12 text-green-500 mb-3 group-hover:scale-110 transition-transform' />
-                  <span className='text-lg font-semibold text-gray-800'>
-                    Successful Delivery
-                  </span>
-                  <span className='text-sm text-gray-600 mt-2 text-center'>
-                    Record delivery details and outcome
-                  </span>
-                </button>
+              {/* Additional button for role_id === 2 */}
+              {user.role_id === 2 && currentRow && (
+                <div className='mb-6 pb-4 border-b border-gray-200'>
+                  <button
+                    onClick={() => {
+                      closeModal();
+                      navigate('create', { state: { row: currentRow } });
+                    }}
+                    className='w-full flex items-center justify-center p-4 border-2 border-blue-300 rounded-lg hover:bg-blue-50 hover:border-blue-500 transition-all duration-200 group'
+                  >
+                    <User className='h-8 w-8 text-blue-500 mr-3 group-hover:scale-110 transition-transform' />
+                    <div className='text-left'>
+                      <span className='block text-lg font-semibold text-gray-800'>
+                        Edit Full Record
+                      </span>
+                      <span className='block text-sm text-gray-600'>
+                        Navigate to detailed edit form
+                      </span>
+                    </div>
+                  </button>
+                </div>
+              )}
 
-                <button
-                  onClick={() => handleOutcomeSelection('miscarriage')}
-                  className='flex flex-col items-center justify-center p-6 border-2 border-red-300 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all duration-200 group'
-                >
-                  <XCircle className='h-12 w-12 text-red-500 mb-3 group-hover:scale-110 transition-transform' />
-                  <span className='text-lg font-semibold text-gray-800'>
-                    Miscarriage or Abortion
-                  </span>
-                  <span className='text-sm text-gray-600 mt-2 text-center'>
-                    Update record as miscarriage/abortion
-                  </span>
-                </button>
-              </div>
+              {user.role_id === 2 &&
+              currentRow &&
+              currentRow.pregnancy_status === 'normal' ? (
+                <>
+                  <h3 className='text-lg font-semibold text-gray-800 text-center mb-6'>
+                    Select Pregnancy Outcome
+                  </h3>
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <button
+                      onClick={() => handleOutcomeSelection('successful')}
+                      className='flex flex-col items-center justify-center p-6 border-2 border-green-300 rounded-lg hover:bg-green-50 hover:border-green-500 transition-all duration-200 group'
+                    >
+                      <CheckCircle className='h-12 w-12 text-green-500 mb-3 group-hover:scale-110 transition-transform' />
+                      <span className='text-lg font-semibold text-gray-800'>
+                        Successful Delivery
+                      </span>
+                      <span className='text-sm text-gray-600 mt-2 text-center'>
+                        Record delivery details and outcome
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleOutcomeSelection('miscarriage')}
+                      className='flex flex-col items-center justify-center p-6 border-2 border-red-300 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all duration-200 group'
+                    >
+                      <XCircle className='h-12 w-12 text-red-500 mb-3 group-hover:scale-110 transition-transform' />
+                      <span className='text-lg font-semibold text-gray-800'>
+                        Miscarriage or Abortion
+                      </span>
+                      <span className='text-sm text-gray-600 mt-2 text-center'>
+                        Update record as miscarriage/abortion
+                      </span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <h3 className='text-lg font-semibold text-gray-800 text-center mb-6'>
+                    Select Pregnancy Outcome
+                  </h3>
+
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <button
+                      onClick={() => handleOutcomeSelection('successful')}
+                      className='flex flex-col items-center justify-center p-6 border-2 border-green-300 rounded-lg hover:bg-green-50 hover:border-green-500 transition-all duration-200 group'
+                    >
+                      <CheckCircle className='h-12 w-12 text-green-500 mb-3 group-hover:scale-110 transition-transform' />
+                      <span className='text-lg font-semibold text-gray-800'>
+                        Successful Delivery
+                      </span>
+                      <span className='text-sm text-gray-600 mt-2 text-center'>
+                        Record delivery details and outcome
+                      </span>
+                    </button>
+
+                    <button
+                      onClick={() => handleOutcomeSelection('miscarriage')}
+                      className='flex flex-col items-center justify-center p-6 border-2 border-red-300 rounded-lg hover:bg-red-50 hover:border-red-500 transition-all duration-200 group'
+                    >
+                      <XCircle className='h-12 w-12 text-red-500 mb-3 group-hover:scale-110 transition-transform' />
+                      <span className='text-lg font-semibold text-gray-800'>
+                        Miscarriage or Abortion
+                      </span>
+                      <span className='text-sm text-gray-600 mt-2 text-center'>
+                        Update record as miscarriage/abortion
+                      </span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           ) : (
             // Original Form for Successful Delivery

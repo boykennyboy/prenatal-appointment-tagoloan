@@ -137,6 +137,7 @@ const Appointments = () => {
             setFormData={setFormData}
             onSubmit={onSubmit}
             error={error}
+            setError={setError}
             isSubmitting={isSubmitting}
           />
         </FormModal>

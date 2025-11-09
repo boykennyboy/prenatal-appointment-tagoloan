@@ -51,6 +51,7 @@ const DataTable = forwardRef((props, ref) => {
     hasSortByAction = false,
     pregnancyStatus = '',
     checkExists = false,
+    setFormDate = null,
   } = props;
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -296,6 +297,13 @@ const DataTable = forwardRef((props, ref) => {
     }
     setSortDirection('asc');
     setCurrentPage(1);
+    if (setFormDate) {
+      setFormDate((prev) => ({
+        ...prev,
+        start_date: '',
+        end_date: '',
+      }));
+    }
   };
 
   const handleDownload = (row) => {
@@ -359,6 +367,14 @@ const DataTable = forwardRef((props, ref) => {
       setDateFrom(selectedDates[0]);
       setDateTo(selectedDates[1]);
       setCurrentPage(1);
+
+      if (setFormDate) {
+        setFormDate((prev) => ({
+          ...prev,
+          start_date: selectedDates[0],
+          end_date: selectedDates[1],
+        }));
+      }
     }
   };
 

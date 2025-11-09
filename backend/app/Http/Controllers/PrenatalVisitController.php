@@ -28,6 +28,8 @@ class PrenatalVisitController extends Controller
         $sortDir    = $request->input('sort_dir', 'desc');
         $perPage    = $request->input('per_page', 10);
         $report     = $request->input('report', false);
+        $start_date = $request->input('start_date', null);
+        $end_date   = $request->input('end_date', null);
 
         $sortableColumns = [
             'fullname' => 'pregnancy_trackings.fullname',
@@ -64,6 +66,12 @@ class PrenatalVisitController extends Controller
             })
             ->when($dateTo, function ($query, $dateTo) {
                 $query->whereDate('prenatal_visits.created_at', '<=', $dateTo);
+            })
+            ->when($start_date, function ($query, $start_date) {
+                $query->whereDate('prenatal_visits.created_at', '>=', $start_date);
+            })
+            ->when($end_date, function ($query, $end_date) {
+                $query->whereDate('prenatal_visits.created_at', '<=', $end_date);
             });
 
 

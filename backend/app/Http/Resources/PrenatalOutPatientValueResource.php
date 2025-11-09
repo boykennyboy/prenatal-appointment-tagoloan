@@ -36,6 +36,7 @@ class PrenatalOutPatientValueResource extends JsonResource
             'pr' => $this->pr ?? '',
             'two_sat' => $this->two_sat ?? '',
             'bp' => $this->bp ?? '',
+            'gravidity' => $pregnancyTracking->gravidity,
             'pregnancy_status' => $pregnancyTracking->pregnancy_status,
             'aog' => $aog ?? '',
         ];
