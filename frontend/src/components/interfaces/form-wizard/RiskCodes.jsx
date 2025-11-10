@@ -232,6 +232,20 @@ const RiskCodes = ({ formData, setFormData, error }) => {
               disabled={risk.auto}
             />
 
+            <SelectGroup
+              hasLabel
+              label={'Select Risk Code'}
+              value={risk.risk_code || ''}
+              options={getRiskCodeOptions(
+                risk_code_options,
+                risks,
+                index,
+                formData
+              )}
+              onChange={(e) => handleChange(index, 'risk_code', e.target.value)}
+              placeholder='Select Risk Code'
+              disabled={risk.auto}
+            />
             {error?.[`risk_codes.${index}.risk_code`] && (
               <p className='text-red-500 text-sm mt-1'>
                 {error[`risk_codes.${index}.risk_code`][0]}
