@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import * as XLSX from 'exceljs';
 import api from '../../api/axios';
 import Breadcrumb from '../../components/ui/Breadcrumb';
@@ -6,6 +7,10 @@ import DataTable from '../../components/ui/Datatable';
 import { out_patient_column } from '../../utils/columns';
 
 const OutPatientReports = () => {
+  const [formDate, setFormDate] = useState({
+    start_date: '',
+    end_date: '',
+  });
   const columns = out_patient_column;
 
   const downloadReport = async () => {
@@ -15,6 +20,16 @@ const OutPatientReports = () => {
 
       const params = {
         report: true,
+        start_date: formDate.start_date
+          ? formDate.start_date.toLocaleDateString('en-CA')
+          : undefined,
+        end_date: formDate.end_date
+          ? (() => {
+              const end = new Date(formDate.end_date);
+              end.setHours(23, 59, 59, 999); // last millisecond of the day
+              return `${end.toLocaleDateString('en-CA')} 23:59:59`;
+            })()
+          : undefined,
       };
 
       // Fetch all pregnancy tracking data
@@ -150,6 +165,53 @@ const OutPatientReports = () => {
         );
       });
 
+      // NEW: Group by Month based on created_at
+      const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+      ];
+
+      // Group createdAt by month-year
+      const createAt = {};
+
+      allData.forEach((item) => {
+        if (item.created_at) {
+          const date = new Date(item.created_at);
+          const monthYear = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, '0')}`;
+          const monthLabel = `${
+            monthNames[date.getMonth()]
+          } ${date.getFullYear()}`;
+
+          if (!createAt[monthYear]) {
+            createAt[monthYear] = {
+              label: monthLabel,
+              data: [],
+            };
+          }
+          createAt[monthYear].data.push(item);
+        }
+      });
+
+      // Sort months chronologically and add worksheets
+      const sortedMonths = Object.keys(createAt).sort();
+
+      sortedMonths.forEach((monthYear) => {
+        const { label, data } = createAt[monthYear];
+        addWorksheet(workbook, label, data, label);
+      });
+
       // 3. Summary Sheet
       const summaryWorksheet = workbook.addWorksheet('Summary');
 
@@ -161,6 +223,12 @@ const OutPatientReports = () => {
         ...Object.keys(attendedBy).map((physician) => [
           physician,
           attendedBy[physician].length,
+        ]),
+        [''],
+        ['Created By Month:', ''],
+        ...sortedMonths.map((monthYear) => [
+          createAt[monthYear].label,
+          createAt[monthYear].data.length,
         ]),
         [''],
         ['Report Generated:', new Date().toLocaleString()],
@@ -240,6 +308,7 @@ const OutPatientReports = () => {
         defaultPerPage={10}
         downloadReport={'Export Out Patients'}
         onDownloadReport={downloadReport}
+        setFormDate={setFormDate}
       />
     </Container>
   );

@@ -44,6 +44,8 @@ class UpdatePregnancyTrackingTrimester extends Command
 
         // Bulk updates with better performance
         $first = PregnancyTracking::whereRaw('TIMESTAMPDIFF(WEEK, lmp, CURDATE()) <= 12')
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
+            ->where('pregnancy_status', '!=', 'completed')
             ->where('pregnancy_status', '!=', 'first_trimester') // Only update if different
             ->update([
                 'pregnancy_status' => 'first_trimester',
@@ -51,6 +53,8 @@ class UpdatePregnancyTrackingTrimester extends Command
             ]);
 
         $second = PregnancyTracking::whereRaw('TIMESTAMPDIFF(WEEK, lmp, CURDATE()) BETWEEN 13 AND 27')
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
+            ->where('pregnancy_status', '!=', 'completed')
             ->where('pregnancy_status', '!=', 'second_trimester')
             ->update([
                 'pregnancy_status' => 'second_trimester',
@@ -58,16 +62,19 @@ class UpdatePregnancyTrackingTrimester extends Command
             ]);
 
         $third = PregnancyTracking::whereRaw('TIMESTAMPDIFF(WEEK, lmp, CURDATE()) BETWEEN 28 AND 40')
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
+            ->where('pregnancy_status', '!=', 'completed')
             ->where('pregnancy_status', '!=', 'third_trimester')
             ->update([
                 'pregnancy_status' => 'third_trimester',
                 'updated_at' => now()
             ]);
 
-        $completed = PregnancyTracking::whereRaw('TIMESTAMPDIFF(WEEK, lmp, CURDATE()) > 40')
+        $completed = PregnancyTracking::whereRaw('TIMESTAMPDIFF(WEEK, lmp, CURDATE()) > 50')
+            ->where('pregnancy_status', '!=', 'miscarriage_abortion')
             ->where('pregnancy_status', '!=', 'completed')
             ->update([
-                'pregnancy_status' => 'completed',
+                'pregnancy_status' => 'discontinued',
                 'updated_at' => now()
             ]);
 
@@ -79,9 +86,9 @@ class UpdatePregnancyTrackingTrimester extends Command
         $message .= "• {$first} set to First Trimester\n";
         $message .= "• {$second} set to Second Trimester\n";
         $message .= "• {$third} set to Third Trimester\n";
-        $message .= "• {$completed} set to Completed\n";
+        $message .= "• {$completed} set to Discontinued\n";
 
-        $notifMessage = "Pregnancy statuses updated: {$totalUpdated} records changed ({$first} first, {$second} second, {$third} third, {$completed} completed).";
+        $notifMessage = "Pregnancy statuses updated: {$totalUpdated} records changed ({$first} first, {$second} second, {$third} third, {$completed} discontinued).";
 
         // Trigger user notification event
         if (User::whereIn('role_id', [1, 3])->exists()) {

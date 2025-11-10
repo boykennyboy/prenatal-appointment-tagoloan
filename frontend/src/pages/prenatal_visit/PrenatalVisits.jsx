@@ -8,11 +8,14 @@ import { useFormSubmit } from '../../utils/functions';
 import { useAuthStore } from '../../store/authStore.js';
 import PrenatalVisitForm from '../../components/forms/prenatal_visits/PrenatalVisitForm';
 import {
+  prenatal_outpatient_immunization_edit_form_data,
+  prenatal_outpatient_immunization_form_data,
   prenatalVisitEditFormData,
   prenatalVisitFormData,
 } from '../../utils/formDefault';
 import PrenatalVisitPDF from '../../components/interfaces/pdf/PrentalVisitPDF';
 import api from '../../api/axios';
+import UnifiedForm from '../../components/forms/unified_form/UnifiedForm.jsx';
 
 const PrenatalVisits = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -39,7 +42,7 @@ const PrenatalVisits = () => {
     setIsEdit(true);
 
     setPrenatalVisitId(row.id);
-    setFormData(prenatalVisitEditFormData(row));
+    setFormData(prenatal_outpatient_immunization_edit_form_data(row));
 
     setIsOpen(true);
   };
@@ -49,18 +52,79 @@ const PrenatalVisits = () => {
     setIsOpen(true);
   };
 
-  const onSubmit = (e) => {
+  // const onSubmit = (e) => {
+  //   handleSubmit({
+  //     e,
+  //     isEdit,
+  //     url: isEdit
+  //       ? `/api/prenatal-visits/${prenatalVisitId}`
+  //       : '/api/prenatal-visits',
+  //     formData,
+  //     onSuccess: () => dataTableRef.current?.fetchData(),
+  //     onReset: () => {
+  //       setFormData(prenatalVisitFormData);
+  //       setError({});
+  //       setIsOpen(false);
+  //       if (isEdit) {
+  //         setPrenatalVisitId(0);
+  //         setIsEdit(false);
+  //       }
+  //     },
+  //   });
+  // };
+
+  const onSubmit = (e, showImmunization, setShowImmunization) => {
+    e.preventDefault();
+
+    // Prepare the data to send
+    let dataToSend = { ...formData };
+
+    // // If patient is NOT in third trimester, remove all immunization fields
+    if (!showImmunization) {
+      const {
+        tetanus_first_given,
+        tetanus_second_given,
+        tetanus_third_given,
+        tetanus_fourth_given,
+        tetanus_fifth_given,
+        tetanus_first_comeback,
+        tetanus_second_comeback,
+        tetanus_third_comeback,
+        tetanus_fourth_comeback,
+        tetanus_fifth_comeback,
+        covid_first_given,
+        covid_second_given,
+        covid_booster_given,
+        covid_first_comeback,
+        covid_second_comeback,
+        covid_booster_comeback,
+        other_vaccine_name,
+        other_first_given,
+        other_second_given,
+        other_third_given,
+        other_fourth_given,
+        other_fifth_given,
+        other_first_comeback,
+        other_second_comeback,
+        other_third_comeback,
+        other_fourth_comeback,
+        other_fifth_comeback,
+        ...prenatalDataOnly
+      } = dataToSend;
+
+      dataToSend = prenatalDataOnly;
+    }
+
     handleSubmit({
       e,
       isEdit,
-      url: isEdit
-        ? `/api/prenatal-visits/${prenatalVisitId}`
-        : '/api/prenatal-visits',
-      formData,
+      url: `/api/unified-form/update/${prenatalVisitId}`,
+      formData: dataToSend,
       onSuccess: () => dataTableRef.current?.fetchData(),
       onReset: () => {
-        setFormData(prenatalVisitFormData);
+        setFormData(prenatal_outpatient_immunization_form_data);
         setError({});
+        setShowImmunization(false);
         setIsOpen(false);
         if (isEdit) {
           setPrenatalVisitId(0);
@@ -78,7 +142,7 @@ const PrenatalVisits = () => {
     }));
   };
 
- const handelDownload = async (row) => {
+  const handelDownload = async (row) => {
     try {
       const response = await api.get(
         `/api/group-prenatal-visits/${row.pregnancy_tracking_id}`
@@ -148,8 +212,8 @@ const PrenatalVisits = () => {
         showPerPage={true}
         showActions={true}
         defaultPerPage={10}
-        onAdd={handleAdd}
-        addButton={user.role_id !== 2 ? 'Add Prenatal Visit' : ''}
+        // onAdd={handleAdd}
+        // addButton={user.role_id !== 2 ? 'Add Prenatal Visit' : ''}
         ref={dataTableRef}
       />
       {isOpen && (
@@ -159,12 +223,22 @@ const PrenatalVisits = () => {
           title={'Prenatal Visit'}
           className={'sm:max-w-6xl'}
         >
-          <PrenatalVisitForm
+          {/* <PrenatalVisitForm
             onSubmit={onSubmit}
             inputChange={inputChange}
             formData={formData}
             setFormData={setFormData}
             error={error}
+            isSubmitting={isSubmitting}
+            isEdit={isEdit}
+          /> */}
+
+          <UnifiedForm
+            formData={formData}
+            setFormData={setFormData}
+            onSubmit={onSubmit}
+            error={error}
+            setError={setError}
             isSubmitting={isSubmitting}
             isEdit={isEdit}
           />

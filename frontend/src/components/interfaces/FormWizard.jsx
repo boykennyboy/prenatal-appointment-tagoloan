@@ -70,6 +70,10 @@ const FormWizard = ({ row = null }) => {
   //   province_name: '',
   //   region_name: '',
   //   abortion: 0,
+  //   risk_codes: [
+  //     { risk_code: '', date_detected: '', risk_status: '', auto: false },
+  //   ],
+  //   record_status: '',
   // });
 
   const { handleSubmit, isSubmitting, error, setError, data } = useFormSubmit();
@@ -165,6 +169,7 @@ const FormWizard = ({ row = null }) => {
 
   const inputChange = (e, phoneNumber = null) => {
     const { name, value } = e.target;
+
     if (phoneNumber) {
       setFormData((prev) => ({ ...prev, [name]: phoneNumber }));
     } else {
@@ -244,7 +249,12 @@ const FormWizard = ({ row = null }) => {
   return (
     <div className='w-full mx-auto sm:p-4'>
       <div className='sticky top-26 z-10 bg-white py-0.5 border-b-1 rounded-lg border-gray-200 -mx-4 px-4 sm:mx-0 sm:px-0'>
-        <StepIndicator steps={steps} currentStep={currentStep} error={error} />
+        <StepIndicator
+          steps={steps}
+          currentStep={currentStep}
+          error={error}
+          formData={formData}
+        />
       </div>
 
       <div className='bg-white border border-gray-200 rounded-lg p-6 mb-6'>

@@ -78,6 +78,30 @@ const PrenatalVisitForm = ({
     }
   };
 
+  const handle_change = (e) => {
+    const { name, value } = e.target;
+
+    if (!value) {
+      setFormData((prev) => ({
+        ...prev,
+        pr: value,
+        fht: '',
+      }));
+    } else if (value < 110 || value > 160) {
+      setFormData((prev) => ({
+        ...prev,
+        pr: value,
+        fht: 'Abnormal',
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        pr: value,
+        fht: 'Normal',
+      }));
+    }
+  };
+
   return (
     <form onSubmit={onSubmit}>
       <div className='flex flex-col md:flex-row items-center gap-4 sm:w-auto'>
@@ -249,8 +273,8 @@ const PrenatalVisitForm = ({
                 name='pr'
                 id='pr'
                 value={formData.pr}
-                onChange={inputChange}
-                placeholder='80'
+                onChange={handle_change}
+                placeholder='110'
                 icon={<HeartPulse className='h-5 w-5 text-gray-400' />}
                 hasLabel
                 label='Pulse Rate (bpm)'

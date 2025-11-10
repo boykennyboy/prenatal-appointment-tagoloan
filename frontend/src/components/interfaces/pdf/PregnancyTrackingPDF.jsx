@@ -208,6 +208,16 @@ const PregnancyTrackingPDF = ({ formData, patientType }) => {
     return { month: '', day: '', year: '' };
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-CA', {
+      month: 'short',
+      day: '2-digit',
+      year: 'numeric',
+    });
+  };
+
   const edc = getEDCValues();
 
   // Function to format risk codes for display
@@ -568,145 +578,105 @@ const PregnancyTrackingPDF = ({ formData, patientType }) => {
           </View>
 
           {/* Data Rows - First row and additional rows for each risk code */}
-          {Array.from({
-            length: Math.max(1, formData.risk_codes?.length || 1),
-          }).map((_, dataRowIndex) => {
-            const isFirstRow = dataRowIndex === 0;
-            const currentRisk = formData.risk_codes?.[dataRowIndex] || null;
+          <View style={styles.tableRow}>
+            <View style={[styles.cell, styles.noCell]}>
+              <Text>1</Text>
+            </View>
+            <View style={[styles.cell, styles.nameCellWidth, styles.nameCell]}>
+              <Text>{getPatientName()}</Text>
+            </View>
+            <View style={[styles.cell, styles.gravidityCell]}>
+              <Text>{formData.patient_short_address || ''}</Text>
+            </View>
+            <View style={[styles.cell, styles.gravidityCell]}>
+              <Text>{formatDate(formData.birth_date) || ''}</Text>
+            </View>
+            <View style={[styles.cell, styles.ageCell]}>
+              <Text>{formData.age || ''}</Text>
+            </View>
+            <View style={[styles.cell, styles.contactCell]}>
+              <Text>
+                {formData.contact && formData.contact.startsWith('63')
+                  ? `0${formData.contact.slice(2)}`
+                  : formData.contact || ''}
+              </Text>
+            </View>
+            <View style={[styles.cell, styles.lmpCell]}>
+              <Text>{formatDate(formData.lmp) || ''}</Text>
+            </View>
+            <View style={[styles.cell, styles.edcCell]}>
+              <Text>{formatDate(formData.edc) || ''}</Text>
+            </View>
 
-            return (
-              <View key={`data-row-${dataRowIndex}`} style={styles.tableRow}>
-                <View style={[styles.cell, styles.noCell]}>
-                  <Text>{isFirstRow ? '1' : ''}</Text>
-                </View>
-                <View
-                  style={[styles.cell, styles.nameCellWidth, styles.nameCell]}
-                >
-                  <Text>{isFirstRow ? getPatientName() : ''}</Text>
-                </View>
-                <View style={[styles.cell, styles.gravidityCell]}>
-                  <Text>
-                    {isFirstRow ? formData.patient_short_address || '' : ''}
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.gravidityCell]}>
-                  <Text>{isFirstRow ? formData.birth_date || '' : ''}</Text>
-                </View>
-                <View style={[styles.cell, styles.ageCell]}>
-                  <Text>{isFirstRow ? formData.age || '' : ''}</Text>
-                </View>
-                <View style={[styles.cell, styles.contactCell]}>
-                  <Text>
-                    {isFirstRow
-                      ? formData.contact && formData.contact.startsWith('63')
-                        ? `0${formData.contact.slice(2)}`
-                        : formData.contact || ''
+            {/* Gravida / Para / Abortion */}
+            <View style={[styles.cell, styles.checkupCell]}>
+              <Text>{`G${formData.gravidity || '-'}`}</Text>
+            </View>
+            <View style={[styles.cell, styles.checkupCell]}>
+              <Text>{`P${formData.parity || '-'}`}</Text>
+            </View>
+            <View style={[styles.cell, styles.checkupCell]}>
+              <Text>{`A${formData.abortion || '-'}`}</Text>
+            </View>
+
+            {/* 4 ANC Given */}
+            <View style={[styles.cell, styles.checkupCell2]}>
+              <Text>{formData?.anc_given ? '/' : ''}</Text>
+            </View>
+            <View style={[styles.cell, styles.checkupCell2]}>
+              <Text></Text>
+            </View>
+
+            {/* Risk Codes in a single cell */}
+            <View
+              style={[
+                styles.cell,
+                styles.checkupCell3,
+                {
+                  alignItems: 'flex-start',
+                  justifyContent: 'flex-start',
+                  paddingTop: 3,
+                },
+              ]}
+            >
+              {formData.risk_codes && formData.risk_codes.length > 0 ? (
+                formData.risk_codes.map((risk, index) => (
+                  <Text key={index} style={styles.riskCodeText}>
+                    Code: {risk.risk_code || ''}
+                    {risk.risk_status ? ` - ${risk.risk_status}` : ''}
+                    {risk.date_detected
+                      ? ` - (Date: ${risk.date_detected})`
                       : ''}
                   </Text>
-                </View>
-                <View style={[styles.cell, styles.lmpCell]}>
-                  <Text>{isFirstRow ? formData.lmp || '' : ''}</Text>
-                </View>
-                <View style={[styles.cell, styles.edcCell]}>
-                  <Text>{isFirstRow ? formData.edc || '' : ''}</Text>
-                </View>
+                ))
+              ) : (
+                <Text></Text>
+              )}
+            </View>
 
-                {/* Antenatal Care columns */}
-                <View style={[styles.cell, styles.checkupCell]}>
-                  <Text>
-                    {isFirstRow ? `G${formData.gravidity || '-'}` : ''}
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.checkupCell]}>
-                  <Text>{isFirstRow ? `P${formData.parity || '-'}` : ''}</Text>
-                </View>
-                <View style={[styles.cell, styles.checkupCell]}>
-                  <Text>
-                    {isFirstRow ? `A${formData.abortion || '-'}` : ''}
-                  </Text>
-                </View>
-
-                {/* 4 ANC Given columns */}
-                <View style={[styles.cell, styles.checkupCell2]}>
-                  <Text>
-                    {isFirstRow ? (formData?.anc_given ? '/' : '') : ''}
-                  </Text>
-                </View>
-                <View style={[styles.cell, styles.checkupCell2]}>
-                  <Text></Text>
-                </View>
-
-                {/* Risk Code and Date Detected column - One risk code per row */}
-                <View
-                  style={[
-                    styles.cell,
-                    styles.checkupCell3,
-                    {
-                      alignItems: 'flex-start',
-                      justifyContent: 'flex-start',
-                      paddingTop: 3,
-                    },
-                  ]}
-                >
-                  {currentRisk ? (
-                    <View>
-                      <Text style={styles.riskCodeText}>
-                        {currentRisk.risk_code || ''}
-                      </Text>
-                      {currentRisk.risk_status && (
-                        <Text style={styles.riskCodeText}>
-                          - {currentRisk.risk_status}
-                        </Text>
-                      )}
-                      {currentRisk.date_detected && (
-                        <Text style={styles.riskCodeText}>
-                          Date: {currentRisk.date_detected}
-                        </Text>
-                      )}
-                    </View>
-                  ) : (
-                    <Text></Text>
-                  )}
-                </View>
-
-                {/* Date Terminated/Delivery */}
-                <View style={[styles.cell, styles.lmpCell]}>
-                  <Text>{isFirstRow ? formData?.date_delivery || '' : ''}</Text>
-                </View>
-
-                {/* Outcome Sex and Weight */}
-                <View style={[styles.cell, { width: 60 }]}>
-                  <Text>
-                    {isFirstRow
-                      ? formData?.outcome_sex && formData?.outcome_weight
-                        ? `${formData.outcome_sex.slice(0, 1).toUpperCase()}/${
-                            formData.outcome_weight
-                          } kg`
-                        : ''
-                      : ''}
-                  </Text>
-                </View>
-
-                {/* Place of delivery and attended by */}
-                <View style={[styles.cell, { width: 65 }]}>
-                  <Text>
-                    {isFirstRow ? formData?.place_of_delivery || '' : ''}
-                  </Text>
-                </View>
-
-                <View style={[styles.cell, { width: 65 }]}>
-                  <Text>{isFirstRow ? formData?.doctor_name || '' : ''}</Text>
-                </View>
-
-                {/* PHIC */}
-                <View style={[styles.cell, { width: 40 }]}>
-                  <Text>
-                    {isFirstRow ? (formData?.phic ? 'Yes' : 'No') : ''}
-                  </Text>
-                </View>
-              </View>
-            );
-          })}
+            {/* Remaining cells */}
+            <View style={[styles.cell, styles.lmpCell]}>
+              <Text>{formData?.date_delivery || ''}</Text>
+            </View>
+            <View style={[styles.cell, { width: 60 }]}>
+              <Text>
+                {formData?.outcome_sex && formData?.outcome_weight
+                  ? `${formData.outcome_sex.slice(0, 1).toUpperCase()}/${
+                      formData.outcome_weight
+                    } kg`
+                  : ''}
+              </Text>
+            </View>
+            <View style={[styles.cell, { width: 65 }]}>
+              <Text>{formData?.place_of_delivery || ''}</Text>
+            </View>
+            <View style={[styles.cell, { width: 65 }]}>
+              <Text>{formData?.doctor_name || ''}</Text>
+            </View>
+            <View style={[styles.cell, { width: 40 }]}>
+              <Text>{formData?.phic ? 'Yes' : 'No'}</Text>
+            </View>
+          </View>
 
           {/* Empty Rows - Adjust count based on risk codes */}
           {formData.risk_codes?.length < 1 &&

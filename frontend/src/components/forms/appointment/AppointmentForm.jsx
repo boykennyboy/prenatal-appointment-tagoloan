@@ -61,13 +61,13 @@ const AppointmentForm = ({ row = null, type = null }) => {
   ];
 
   const priorities = {
-    high: {
-      label: 'High Priority',
+    priority_queue: {
+      label: 'Priority Queue',
       color: 'bg-red-100 text-red-800 border-red-200',
       value: 1,
     },
-    low: {
-      label: 'Low Priority',
+    regular_queue: {
+      label: 'Regular Queue',
       color: 'bg-green-100 text-green-800 border-green-200',
       value: 3,
     },

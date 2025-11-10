@@ -65,24 +65,38 @@ export const pregnancy_tracking_columns = [
           status = '1st Trimester';
           break;
         case 'second_trimester':
-          colorClass = 'bg-teal-100 text-teal-800';
+          colorClass = 'bg-cyan-100 text-cyan-800';
           status = '2nd Trimester';
           break;
         case 'third_trimester':
-          colorClass = 'bg-purple-100 text-purple-800';
+          colorClass = 'bg-indigo-100 text-indigo-800';
           status = '3rd Trimester';
           break;
         case 'accepted':
+          colorClass = 'bg-emerald-100 text-emerald-800';
           status = 'Accepted';
-          colorClass = 'bg-green-100 text-green-800';
           break;
         case 'pending':
+          colorClass = 'bg-amber-100 text-amber-800';
           status = 'Pending';
-          colorClass = 'bg-yellow-100 text-yellow-800';
+          break;
+        case 'miscarriage_abortion':
+          colorClass = 'bg-rose-100 text-rose-800';
+          status = 'Miscarriage/Abortion';
+          break;
+        case 'discontinued':
+          colorClass = 'bg-orange-100 text-orange-800';
+          status = 'Discontinued';
+          break;
+        case 'normal':
+          colorClass = 'bg-lime-100 text-lime-800';
+          status = 'Normal';
           break;
         default:
           colorClass = 'bg-gray-200 text-gray-800';
+          status = 'Unknown';
       }
+
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}
@@ -97,7 +111,7 @@ export const pregnancy_tracking_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -345,13 +359,14 @@ export const barangay_center_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-      render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
         year: 'numeric', // "2025"
       });
-    },  },
+    },
+  },
   {
     key: 'id',
     hidden: true,
@@ -407,7 +422,7 @@ export const barangay_worker_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -454,32 +469,34 @@ export const nurse_columns = [
     width: 'w-[30%]',
   },
   {
-  key: 'license_number',
-  title: 'License',
-  sortable: false,
-  width: '10%',
-  render: (value) => {
-    let colorClass = 'bg-gray-200 text-gray-800';
-    let status = 'No License';
+    key: 'license_number',
+    title: 'License',
+    sortable: false,
+    width: '10%',
+    render: (value) => {
+      let colorClass = 'bg-gray-200 text-gray-800';
+      let status = 'No License';
 
-    if (value ) {
-      colorClass = 'bg-green-100 text-green-800';
-      status = 'Licensed';
-    }
+      if (value) {
+        colorClass = 'bg-green-100 text-green-800';
+        status = 'Licensed';
+      }
 
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
-        {status}
-      </span>
-    );
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}
+        >
+          {status}
+        </span>
+      );
+    },
   },
-},
   {
     key: 'created_at',
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -529,32 +546,34 @@ export const midwife_columns = [
     width: 'w-[30%]',
   },
   {
-  key: 'license_number',
-  title: 'License',
-  sortable: false,
-  width: '10%',
-  render: (value) => {
-    let colorClass = 'bg-gray-200 text-gray-800';
-    let status = 'No License';
+    key: 'license_number',
+    title: 'License',
+    sortable: false,
+    width: '10%',
+    render: (value) => {
+      let colorClass = 'bg-gray-200 text-gray-800';
+      let status = 'No License';
 
-    if (value ) {
-      colorClass = 'bg-green-100 text-green-800';
-      status = 'Licensed';
-    }
+      if (value) {
+        colorClass = 'bg-green-100 text-green-800';
+        status = 'Licensed';
+      }
 
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
-        {status}
-      </span>
-    );
+      return (
+        <span
+          className={`px-2 py-1 rounded-full text-xs font-semibold ${colorClass}`}
+        >
+          {status}
+        </span>
+      );
+    },
   },
-},
   {
     key: 'created_at',
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -601,7 +620,7 @@ export const user_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -650,7 +669,7 @@ export const prenatal_visit_column = [
     title: 'Date',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -688,7 +707,7 @@ export const prenatal_visit_column = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -834,7 +853,7 @@ export const out_patient_column = [
     title: 'Date',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -902,7 +921,7 @@ export const out_patient_column = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -1048,7 +1067,7 @@ export const immunization_records_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[15%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -1228,24 +1247,37 @@ export const appointment_columns = [
     width: 'w-[10%]',
     render: (value) => {
       let colorClass = '';
+      let priority = '';
       switch (value) {
         case 'high':
           colorClass = 'bg-red-100 text-red-800';
+          priority = 'High';
           break;
         case 'medium':
           colorClass = 'bg-yellow-100 text-yellow-800';
+          priority = 'Medium';
           break;
         case 'low':
           colorClass = 'bg-green-100 text-green-800';
+          priority = 'Low';
+          break;
+        case 'priority_queue':
+          colorClass = 'bg-red-100 text-red-800';
+          priority = 'Priority Queue';
+          break;
+        case 'regular_queue':
+          colorClass = 'bg-green-100 text-green-800';
+          priority = 'Regular Queue';
           break;
         default:
           colorClass = 'bg-gray-100 text-gray-800';
+          priority = 'Unknown';
       }
       return (
         <span
           className={`px-2 py-1 rounded-full text-xs font-semibold capitalize ${colorClass}`}
         >
-          {value}
+          {priority}
         </span>
       );
     },
@@ -1325,7 +1357,7 @@ export const appointment_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[10%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -1379,9 +1411,7 @@ export const pickerOptions = {
   mode: 'single',
   dateFormat: 'Y-m-d',
   altInput: true,
-   disable: [
-    (date) => false,
-  ],
+  disable: [(date) => false],
 };
 
 export const pickerNoWeekendsOptions = {
@@ -1428,7 +1458,7 @@ export const doctor_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[20%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
@@ -1509,7 +1539,7 @@ export const activity_log_columns = [
     title: 'Created',
     sortable: true,
     width: 'w-[7%]',
-     render: (value) => {
+    render: (value) => {
       return new Date(value).toLocaleDateString('en-US', {
         month: 'short', // "Oct"
         day: '2-digit', // "01"
