@@ -41,6 +41,8 @@ class AppointmentController extends Controller
         $sortDir    = $request->input('sort_dir', 'desc');
         $perPage    = $request->input('per_page', 10);
         $report     = $request->input('report', false);
+        $start_date = $request->input('start_date', null);
+        $end_date   = $request->input('end_date', null);
 
         // Optional: whitelist sortable columns to prevent SQL injection
         $sortableColumns = [
@@ -79,6 +81,12 @@ class AppointmentController extends Controller
             })
             ->when($dateTo, function ($query, $dateTo) {
                 $query->whereDate('appointments.appointment_date', '<=', $dateTo);
+            })
+            ->when($start_date, function ($query, $start_date) {
+                $query->whereDate('appointments.appointment_date', '>=', $start_date);
+            })
+            ->when($end_date, function ($query, $end_date) {
+                $query->whereDate('appointments.appointment_date', '<=', $end_date);
             });
 
         if ($report) {
@@ -110,8 +118,6 @@ class AppointmentController extends Controller
                 ],
             ];
         }
-
-       
     }
 
     public function show(Appointment $qppointment) {}
@@ -124,7 +130,7 @@ class AppointmentController extends Controller
         $request->validate([
             'pregnancy_tracking_id' => 'required|exists:pregnancy_trackings,id',
             'appointment_date' => 'required|date|after:today',
-            'priority' => 'required|in:high,medium,low',
+            'priority' => 'required|in:high,medium,low,priority_queue,regular_queue',
             'visit_count' => 'integer|min:1',
             'doctor_id' => 'required',
             'notes' => 'nullable|string|max:1000'
@@ -195,7 +201,7 @@ class AppointmentController extends Controller
                     ['after_or_equal:today']
                 ),
             ],
-            'priority' => 'required|in:high,medium,low',
+            'priority' => 'required|in:high,medium,low,priority_queue,regular_queue',
             'visit_count' => 'integer|min:1',
             'notes' => 'nullable|string|max:1000',
         ]);

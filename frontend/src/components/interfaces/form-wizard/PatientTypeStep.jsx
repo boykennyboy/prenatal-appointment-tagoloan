@@ -1,6 +1,7 @@
 import { User, UserCheck } from 'lucide-react';
 import SelectReact from '../../ui/SelectReact';
 import NewPatientBasicInfo from './NewPatientBasicInfo';
+import api from '../../../api/axios';
 
 const PatientTypeCard = ({
   type,
@@ -49,6 +50,98 @@ const PatientTypeStep = ({
     setPatientType(value);
     setFormData((prev) => ({ ...prev, patient_type: value }));
   };
+
+  const handle_birth_date = (value, gravidity) => {
+    // Calculate age
+    const birthDate = new Date(value);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthDate.getDate())
+    ) {
+      age--;
+    }
+
+    setFormData((prev) => {
+      let updatedRiskCodes = [...(prev.risk_codes || [])];
+
+      // Remove A or B if previously added
+      updatedRiskCodes = updatedRiskCodes.filter(
+        (r) => r.risk_code !== 'A' && r.risk_code !== 'B'
+      );
+
+      // Add A or B depending on age
+      if (age < 18) {
+        updatedRiskCodes.push({
+          risk_code: 'A',
+          date_detected: '',
+          risk_status: '',
+          auto: true,
+        });
+      } else if (age > 35) {
+        updatedRiskCodes.push({
+          risk_code: 'B',
+          date_detected: '',
+          risk_status: '',
+          auto: true,
+        });
+      }
+
+      if (gravidity > 3) {
+        updatedRiskCodes.push({
+          risk_code: 'D',
+          date_detected: '',
+          risk_status: '',
+          auto: true,
+        });
+      }
+
+      return {
+        ...prev,
+        birth_date: value,
+        risk_codes: updatedRiskCodes,
+      };
+    });
+  };
+
+  const handle_existing_patient = async (id) => {
+    const params = {
+      patient_id: id,
+    };
+
+    const res = await api.get('/api/filter/existing-patient', { params });
+
+    const data = res.data.data || res.data;
+
+    if (data) {
+      setFormData((prev) => ({
+        ...prev,
+        gravidity: Number(data.gravidity) + 1,
+        parity: data.parity,
+        abortion: data.abortion,
+        birth_date: data.birth_date,
+        record_status: data.pregnancy_status,
+        barangay_center_id: data.barangay_center_id,
+        barangay_health_station: data.barangay_health_station,
+      }));
+
+      handle_birth_date(data.birth_date, data.gravidity);
+    }
+  };
+
+  const handle_change = (value) => {
+    setFormData((prev) => ({
+      ...prev,
+      patient_id: value,
+    }));
+
+    if (value) {
+      handle_existing_patient(value);
+    }
+  };
   return (
     <div className='space-y-6'>
       {!isEdit && (
@@ -87,9 +180,10 @@ const PatientTypeStep = ({
             placeholder='Choose a patient'
             formData={formData}
             setFormData={setFormData}
+            onChange={(value) => handle_change(value)}
             labelKey='fullname'
           />
-          {error.patient_it && (
+          {error.patient_id && (
             <p className='error mt-1'>{error.patient_id[0]}</p>
           )}
         </div>

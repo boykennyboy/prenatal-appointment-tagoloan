@@ -19,7 +19,12 @@ class DashboardPregnancyResource extends JsonResource
 
         // Check if patient has an appointment
         $hasAppointment = $this->appointments()->exists();
-        // assuming PregnancyTracking has relation ->appointments()
+
+        $high_risk = $this->risk_codes()->exists();
+
+        $pregnancy_status = ($user && $user->id === 2)
+            ? (!$high_risk ? 'normal' : ($hasAppointment ? 'accepted' : 'pending'))
+            : $this->pregnancy_status;
 
         return [
             'id' => $this->id,
@@ -28,9 +33,7 @@ class DashboardPregnancyResource extends JsonResource
             'health_station' => $this->barangay_center->health_station,
             'created_at' => Carbon::parse($this->appointment_date)->format('m/d/Y'),
 
-            'status' => $user && $user->id === 2
-                ? ($hasAppointment ? 'accepted' : 'pending')
-                : $this->pregnancy_status,
+            'status' => $pregnancy_status,
         ];
     }
 }

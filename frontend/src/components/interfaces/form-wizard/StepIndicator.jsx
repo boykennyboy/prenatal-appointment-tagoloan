@@ -1,7 +1,12 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, AlertTriangle } from 'lucide-react';
 
-const StepIndicator = ({ steps, currentStep, error }) => {
+const StepIndicator = ({ steps, currentStep, error, formData }) => {
+  const showDiscontinuedWarning =
+    currentStep === 3 &&
+    formData?.patient_type === 'existing' &&
+    formData?.record_status === 'discontinued';
+
   return (
     <div className='mb-8'>
       <div className='flex items-center justify-between mb-4'>
@@ -43,6 +48,19 @@ const StepIndicator = ({ steps, currentStep, error }) => {
           {steps[currentStep - 1].title}
         </h2>
         <p className='text-gray-600'>{steps[currentStep - 1].description}</p>
+
+        {showDiscontinuedWarning && (
+          <div className='mt-3 mx-auto max-w-2xl'>
+            <div className='flex items-start gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg'>
+              <AlertTriangle className='h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5' />
+              <p className='text-sm text-amber-800 text-left'>
+                <span className='font-semibold'>Important:</span> This patient
+                has a discontinued record. Please conduct a thorough interview
+                to gather updated health information before proceeding.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

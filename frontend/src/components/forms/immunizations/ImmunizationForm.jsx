@@ -536,7 +536,9 @@ const ImmunizationForm = ({
             label='Select Patient'
             id='pregnancy_tracking_id'
             name='pregnancy_tracking_id'
-            endpoint={`/api/filter/pregnancy-trakings/has-appointments`}
+            endpoint={`/api/filter/pregnancy-trakings/has-appointments${
+              isEdit ? '?isEdit=true' : ''
+            }`}
             placeholder='Choose a patient'
             value={formData.pregnancy_tracking_id}
             formData={formData}
