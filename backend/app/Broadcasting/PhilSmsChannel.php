@@ -24,9 +24,10 @@ class PhilSmsChannel
             : $message['recipient'];
 
         try {
-            $response = $client->post('https://app.philsms.com/api/v3/sms/send', [
+            $response = $client->post('https://dashboard.philsms.com/api/v3/sms/send', [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $apiKey,
+                    'Content-Type' => 'application/json',
                     'Accept'        => 'application/json',
                 ],
                 'json' => [
