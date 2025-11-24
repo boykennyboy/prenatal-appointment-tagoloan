@@ -17,8 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withSchedule(function (Schedule $schedule) {
 
-        $schedule->command('app:send-appointment-reminders')->dailyAt('20:00');
-        $schedule->command('app:update-trimester')->dailyAt('01:06');
+        $schedule->command('app:send-appointment-reminders')->dailyAt('13:59');
+        $schedule->command('app:update-trimester')->dailyAt('19:00');
         $schedule->command('app:update-missed-appointments')->dailyAt('18:00');
     })
     ->withBroadcasting(
