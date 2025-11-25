@@ -52,40 +52,40 @@ const Appointments = () => {
     let dataToSend = { ...formData };
 
     // // If patient is NOT in third trimester, remove all immunization fields
-    if (!showImmunization) {
-      const {
-        tetanus_first_given,
-        tetanus_second_given,
-        tetanus_third_given,
-        tetanus_fourth_given,
-        tetanus_fifth_given,
-        tetanus_first_comeback,
-        tetanus_second_comeback,
-        tetanus_third_comeback,
-        tetanus_fourth_comeback,
-        tetanus_fifth_comeback,
-        covid_first_given,
-        covid_second_given,
-        covid_booster_given,
-        covid_first_comeback,
-        covid_second_comeback,
-        covid_booster_comeback,
-        other_vaccine_name,
-        other_first_given,
-        other_second_given,
-        other_third_given,
-        other_fourth_given,
-        other_fifth_given,
-        other_first_comeback,
-        other_second_comeback,
-        other_third_comeback,
-        other_fourth_comeback,
-        other_fifth_comeback,
-        ...prenatalDataOnly
-      } = dataToSend;
+    // if (!showImmunization) {
+    //   const {
+    //     tetanus_first_given,
+    //     tetanus_second_given,
+    //     tetanus_third_given,
+    //     tetanus_fourth_given,
+    //     tetanus_fifth_given,
+    //     tetanus_first_comeback,
+    //     tetanus_second_comeback,
+    //     tetanus_third_comeback,
+    //     tetanus_fourth_comeback,
+    //     tetanus_fifth_comeback,
+    //     covid_first_given,
+    //     covid_second_given,
+    //     covid_booster_given,
+    //     covid_first_comeback,
+    //     covid_second_comeback,
+    //     covid_booster_comeback,
+    //     other_vaccine_name,
+    //     other_first_given,
+    //     other_second_given,
+    //     other_third_given,
+    //     other_fourth_given,
+    //     other_fifth_given,
+    //     other_first_comeback,
+    //     other_second_comeback,
+    //     other_third_comeback,
+    //     other_fourth_comeback,
+    //     other_fifth_comeback,
+    //     ...prenatalDataOnly
+    //   } = dataToSend;
 
-      dataToSend = prenatalDataOnly;
-    }
+    //   dataToSend = prenatalDataOnly;
+    // }
 
     handleSubmit({
       e,
