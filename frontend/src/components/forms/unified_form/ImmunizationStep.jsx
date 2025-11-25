@@ -4,13 +4,13 @@ import { pickerNoWeekendsOptions } from '../../../utils/columns';
 import InputGroup from '../../ui/InputGroup';
 import { useState } from 'react';
 
-const ImmunizationStep = (
+const ImmunizationStep = ({
   formData = {},
   handleInputChange = () => {},
   error = {},
   isEdit = false,
   initialFormData = {}
-) => {
+}) => {
   const [activeTab, setActiveTab] = useState('tetanus');
 
   const tabs = [
