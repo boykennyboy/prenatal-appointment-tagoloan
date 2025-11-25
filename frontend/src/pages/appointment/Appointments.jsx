@@ -9,6 +9,7 @@ import { useAuthStore } from '../../store/authStore.js';
 import { useFormSubmit } from '../../utils/functions.jsx';
 import { prenatal_outpatient_immunization_form_data } from '../../utils/formDefault.jsx';
 
+
 const Appointments = () => {
   const navigate = useNavigate();
   const dataTableRef = useRef();
